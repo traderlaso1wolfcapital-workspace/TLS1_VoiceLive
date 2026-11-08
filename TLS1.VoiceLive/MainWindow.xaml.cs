@@ -20,11 +20,16 @@ public partial class MainWindow : Window
         _viewModel = viewModel;
         DataContext = viewModel;
         UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled);
+        UpdateMuteButtonVisual(_viewModel.IsMuted);
         _viewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(MainViewModel.IsAiReplyEnabled))
             {
                 Dispatcher.Invoke(() => UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled));
+            }
+            else if (e.PropertyName == nameof(MainViewModel.IsMuted))
+            {
+                Dispatcher.Invoke(() => UpdateMuteButtonVisual(_viewModel.IsMuted));
             }
         };
     }
@@ -144,16 +149,20 @@ public partial class MainWindow : Window
     /// <summary>
     /// Thêm slang vào từ điển khi người dùng nhấn ➕.
     /// </summary>
-    private bool _muted = false;
     private void BtnMute_Click(object sender, RoutedEventArgs e)
     {
-        _muted = !_muted;
-        btnMute.Content = _muted ? "🔇" : "🔊";
-        btnMute.Background = _muted
+        _viewModel.IsMuted = !_viewModel.IsMuted;
+        UpdateMuteButtonVisual(_viewModel.IsMuted);
+    }
+
+    private void UpdateMuteButtonVisual(bool isMuted)
+    {
+        if (btnMute == null) return;
+        btnMute.Content = isMuted ? "🔇" : "🔊";
+        btnMute.Background = isMuted
             ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xEF, 0x44, 0x44))
             : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0x2F, 0x42));
-        _viewModel.GetTtsEngine()?.SetMuted(_muted);
-        txtCloneStatus.Text = _muted ? "🔇 Đã tắt âm thanh" : "🔊 Đã bật âm thanh";
+        txtCloneStatus.Text = isMuted ? "🔇 Đã tắt âm thanh" : "🔊 Đã bật âm thanh";
     }
 
     private void BtnToggleAiReply_Click(object sender, RoutedEventArgs e)
@@ -173,7 +182,7 @@ public partial class MainWindow : Window
             btnAiReply.BorderThickness = new Thickness(1.5);
             txtAiIcon.Text = "🤖";
             txtAiIcon.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
-            txtAiLabel.Text = "CMT AI";
+            txtAiLabel.Text = "Trả lời AI";
             txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
         }
         else
@@ -183,7 +192,7 @@ public partial class MainWindow : Window
             btnAiReply.BorderThickness = new Thickness(1);
             txtAiIcon.Text = "🤖";
             txtAiIcon.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
-            txtAiLabel.Text = "CMT AI";
+            txtAiLabel.Text = "Trả lời AI";
             txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
         }
     }

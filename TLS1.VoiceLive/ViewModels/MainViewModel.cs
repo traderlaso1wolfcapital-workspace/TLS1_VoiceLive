@@ -102,6 +102,25 @@ public class MainViewModel : INotifyPropertyChanged
     public string AiApiKey { get => _aiApiKey; set { _aiApiKey = value; OnPropertyChanged(); } }
     public string AiModel { get => _aiModel; set { _aiModel = value; OnPropertyChanged(); } }
 
+    private bool _isMuted;
+    public bool IsMuted
+    {
+        get => _isMuted;
+        set
+        {
+            if (_isMuted == value) return;
+            _isMuted = value;
+            OnPropertyChanged();
+            if (value)
+            {
+                Task.Run(() =>
+                {
+                    try { (_ttsEngine as TLS1.AI.Engines.EdgeTtsEngine)?.CancelAll(); } catch { }
+                });
+            }
+        }
+    }
+
     public bool IsRunning { get => _isRunning; set { _isRunning = value; OnPropertyChanged(); } }
     public string StatusText { get => _statusText; set { _statusText = value; OnPropertyChanged(); } }
     public string ConnectedPlatformsText { get => _connectedPlatformsText; set { _connectedPlatformsText = value; OnPropertyChanged(); } }
@@ -290,6 +309,25 @@ public class MainViewModel : INotifyPropertyChanged
         return $"{prefix}{text}";
     }
 
+    private async Task SpeakChatMessageAsync(string platform, string username, string content)
+    {
+        if (IsMuted) return;
+        try
+        {
+            if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
+                await edgeTts.SpeakCommentAsync(username, content);
+            else
+            {
+                var textToSpeak = FormatSpeechText(platform, username, content);
+                await _ttsEngine.SpeakAsync(textToSpeak);
+            }
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Lỗi phát âm thanh bình luận");
+        }
+    }
+
     private void StartScraperForSource(LiveSource source)
     {
         var scraper = new TLS1.Chat.Providers.BrowserScraperProvider();
@@ -302,12 +340,10 @@ public class MainViewModel : INotifyPropertyChanged
                 MessageCount++;
                 while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
             });
-            if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
-                _ = edgeTts.SpeakCommentAsync(msg.Username, msg.Content);
-            else
+
+            if (!IsMuted)
             {
-                var textToSpeak = FormatSpeechText(msg.Platform, msg.Username, msg.Content);
-                _ = _ttsEngine.SpeakAsync(textToSpeak);
+                _ = SpeakChatMessageAsync(msg.Platform, msg.Username, msg.Content);
             }
 
             if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(msg.Content))
@@ -378,12 +414,9 @@ public class MainViewModel : INotifyPropertyChanged
                     MessageCount++;
                     while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
                 });
-                if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
-                    await edgeTts.SpeakCommentAsync(username, message);
-                else
+                if (!IsMuted)
                 {
-                    var textToSpeak = FormatSpeechText("Demo", username, message);
-                    await _ttsEngine.SpeakAsync(textToSpeak);
+                    await SpeakChatMessageAsync("Demo", username, message);
                 }
 
                 if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(message))
@@ -405,8 +438,11 @@ public class MainViewModel : INotifyPropertyChanged
             MessageCount++;
             while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
         });
-        var textToSpeak = FormatSpeechText(msg.Platform, msg.Username, msg.Content);
-        await _ttsEngine.SpeakAsync(textToSpeak);
+
+        if (!IsMuted)
+        {
+            await SpeakChatMessageAsync(msg.Platform, msg.Username, msg.Content);
+        }
 
         if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(msg.Content))
         {
@@ -439,12 +475,10 @@ public class MainViewModel : INotifyPropertyChanged
                 MessageCount++;
                 while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
             });
-            if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
-                _ = edgeTts.SpeakCommentAsync(msg.Username, msg.Content);
-            else
+
+            if (!IsMuted)
             {
-                var textToSpeak = FormatSpeechText(msg.Platform, msg.Username, msg.Content);
-                _ = _ttsEngine.SpeakAsync(textToSpeak);
+                _ = SpeakChatMessageAsync(msg.Platform, msg.Username, msg.Content);
             }
 
             if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(msg.Content))
@@ -524,8 +558,8 @@ public class MainViewModel : INotifyPropertyChanged
                 while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
             });
 
-            // Kiểm tra trạng thái hủy lần nữa trước khi phát tiếng
-            if (!IsAiReplyEnabled || cts.IsCancellationRequested) return;
+            // Kiểm tra trạng thái hủy và mute lần nữa trước khi phát tiếng
+            if (!IsAiReplyEnabled || cts.IsCancellationRequested || IsMuted) return;
 
             // Đọc trực tiếp câu trả lời của AI một cách tự nhiên, KHÔNG có tiền tố "AI nói là"
             await _ttsEngine.SpeakAsync(reply);
