@@ -21,7 +21,7 @@ public partial class MainWindow : Window
         DataContext = viewModel;
         UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled);
         UpdateMuteButtonVisual(_viewModel.IsMuted);
-        UpdateSettingsButtonVisual(pnlSettings.Visibility == Visibility.Visible);
+        SwitchTab(0);
         _viewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(MainViewModel.IsAiReplyEnabled))
@@ -198,11 +198,61 @@ public partial class MainWindow : Window
         }
     }
 
+    private void BtnTabChat_Click(object sender, RoutedEventArgs e) => SwitchTab(0);
+
+    private void BtnTabSettings_Click(object sender, RoutedEventArgs e) => SwitchTab(1);
+
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
     {
-        var isVisible = pnlSettings.Visibility == Visibility.Visible;
-        pnlSettings.Visibility = isVisible ? Visibility.Collapsed : Visibility.Visible;
-        UpdateSettingsButtonVisual(!isVisible);
+        var isSettingsActive = viewSettings.Visibility == Visibility.Visible;
+        SwitchTab(isSettingsActive ? 0 : 1);
+    }
+
+    public void SwitchTab(int tabIndex)
+    {
+        if (viewChatLog == null || viewSettings == null) return;
+
+        var activeBorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x38, 0x45, 0x5E));
+        var activeBgBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x1C, 0x23, 0x33));
+        var activeFgBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
+        var inactiveFgBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x94, 0xA3, 0xB8));
+
+        if (tabIndex == 0)
+        {
+            viewChatLog.Visibility = Visibility.Visible;
+            viewSettings.Visibility = Visibility.Collapsed;
+
+            btnTabChat.Background = activeBgBrush;
+            btnTabChat.BorderBrush = activeBorderBrush;
+            btnTabChat.BorderThickness = new Thickness(1, 1, 1, 0);
+            txtTabChatLabel.Foreground = activeFgBrush;
+            txtTabChatLabel.FontWeight = FontWeights.Bold;
+
+            btnTabSettings.Background = System.Windows.Media.Brushes.Transparent;
+            btnTabSettings.BorderThickness = new Thickness(0);
+            txtTabSettingsLabel.Foreground = inactiveFgBrush;
+            txtTabSettingsLabel.FontWeight = FontWeights.SemiBold;
+
+            UpdateSettingsButtonVisual(false);
+        }
+        else
+        {
+            viewChatLog.Visibility = Visibility.Collapsed;
+            viewSettings.Visibility = Visibility.Visible;
+
+            btnTabChat.Background = System.Windows.Media.Brushes.Transparent;
+            btnTabChat.BorderThickness = new Thickness(0);
+            txtTabChatLabel.Foreground = inactiveFgBrush;
+            txtTabChatLabel.FontWeight = FontWeights.SemiBold;
+
+            btnTabSettings.Background = activeBgBrush;
+            btnTabSettings.BorderBrush = activeBorderBrush;
+            btnTabSettings.BorderThickness = new Thickness(1, 1, 1, 0);
+            txtTabSettingsLabel.Foreground = activeFgBrush;
+            txtTabSettingsLabel.FontWeight = FontWeights.Bold;
+
+            UpdateSettingsButtonVisual(true);
+        }
     }
 
     private void UpdateSettingsButtonVisual(bool isOpen)

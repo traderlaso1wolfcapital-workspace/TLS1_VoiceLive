@@ -168,7 +168,7 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- ── SECTION CARD (Nâng tone sáng #1C2333, viền nét #38455E nổi bật hẳn trên nền #0F121C) ── -->
+        <!-- ── SECTION CARD ── -->
         <Style x:Key="SectionCard" TargetType="Border">
             <Setter Property="Background" Value="#1C2333"/>
             <Setter Property="CornerRadius" Value="6"/>
@@ -178,7 +178,7 @@
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
-        <!-- Section header bar (Tone sáng nổi bật #252E42 làm rõ thanh Tab) -->
+        <!-- Section header bar -->
         <Style x:Key="SectionHeader" TargetType="Border">
             <Setter Property="Background" Value="#252E42"/>
             <Setter Property="BorderBrush" Value="#38455E"/>
@@ -205,20 +205,46 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- ── TAB HEADER BUTTON ── -->
+        <Style x:Key="BtnTabHeader" TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14,4"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4,4,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.88"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <!-- ══════════════════════════════════════════════════════ -->
     <!-- ROOT GRID                                              -->
-    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- ══════════════════════════════════════════════════ -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>    <!-- 0: Titlebar -->
-            <RowDefinition Height="Auto"/>  <!-- 1: Source section -->
-            <RowDefinition Height="Auto"/>  <!-- 2: Voice section -->
-            <RowDefinition Height="Auto"/>  <!-- 3: Clone/Slang section -->
-            <RowDefinition Height="Auto"/>  <!-- 4: Control bar -->
-            <RowDefinition Height="Auto"/>  <!-- 5: Status bar -->
-            <RowDefinition Height="*"/>     <!-- 6: Chat log -->
+            <RowDefinition Height="Auto"/>  <!-- 1: Nguồn livestream -->
+            <RowDefinition Height="Auto"/>  <!-- 2: Control bar -->
+            <RowDefinition Height="*"/>     <!-- 3: Unified Main Card (Tabs + Status + Content) -->
         </Grid.RowDefinitions>
 
         <!-- ══════════════════════════════════════════════════ -->
@@ -356,183 +382,9 @@
         </Border>
 
         <!-- ══════════════════════════════════════════════════ -->
-        <!-- 2. CÀI ĐẶT: GIỌNG ĐỌC & CLONE / SLANG (ẨN MẶC ĐỊNH) -->
+        <!-- 2. CONTROL BAR                                     -->
         <!-- ══════════════════════════════════════════════════ -->
-        <Grid Grid.Row="2" x:Name="pnlSettings" Visibility="Collapsed">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- 2A. GIỌNG ĐỌC / TTS -->
-            <Border Grid.Column="0" Style="{StaticResource SectionCard}" Margin="8,0,4,8">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🗣 " FontSize="13"/>
-                            <TextBlock Text="GIỌNG ĐỌC" Foreground="#F59E0B"
-                                       FontSize="12" FontWeight="Bold"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="1" Style="{StaticResource SectionBody}">
-                        <Grid VerticalAlignment="Center">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid Grid.Row="0" Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Giọng đọc:" Foreground="#94A3B8"
-                                           FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <ComboBox Grid.Column="1"
-                                          ItemsSource="{Binding AvailableVoices}"
-                                          SelectedValue="{Binding SelectedVoiceId}"
-                                          SelectedValuePath="Id" Height="30"/>
-                            </Grid>
-
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Mẫu câu:" Foreground="#94A3B8"
-                                           FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <TextBox Grid.Column="1"
-                                         Text="{Binding PrefixTemplate, UpdateSourceTrigger=PropertyChanged}"
-                                         Height="30" VerticalContentAlignment="Center"
-                                         ToolTip="VD: [{Platform}] {Username} nói: "/>
-                            </Grid>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </Border>
-
-            <!-- 2B. CLONE GIỌNG + SLANG -->
-            <Border Grid.Column="1" Style="{StaticResource SectionCard}" Margin="4,0,8,8">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🎤 " FontSize="13"/>
-                            <TextBlock Text="CLONE GIỌNG &amp; SLANG" Foreground="#F59E0B"
-                                       FontSize="12" FontWeight="Bold"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="1" Style="{StaticResource SectionBody}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Clone row -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Clone:" Foreground="#94A3B8"
-                                           FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <Button Grid.Column="1" Content="📁 File MP3"
-                                        Height="28" Padding="8,4"
-                                        Background="#262F42" Foreground="#F1F5F9"
-                                        BorderBrush="#38455E" BorderThickness="1"
-                                        FontSize="11" Style="{StaticResource BtnBase}"
-                                        Click="BtnBrowseAudio_Click"/>
-                                <TextBox Grid.Column="2" x:Name="txtCloneFilePath"
-                                         Height="28" VerticalContentAlignment="Center"
-                                         FontSize="11" Margin="6,0"
-                                         IsReadOnly="True" Text="Chưa chọn file"
-                                         Foreground="#94A3B8"/>
-                                <Button Grid.Column="3" x:Name="btnCloneVoice"
-                                        Content="▶ Clone"
-                                        Height="28" Padding="10,4"
-                                        Background="#10B981" Foreground="White"
-                                        FontSize="11" FontWeight="Bold"
-                                        Style="{StaticResource BtnBase}"
-                                        IsEnabled="False" Click="BtnCloneVoice_Click"/>
-                                <Button Grid.Column="4" x:Name="btnClearClone"
-                                        Content="✕ Xóa"
-                                        Height="28" Padding="8,4"
-                                        Background="#EF4444" Foreground="White"
-                                        FontSize="11" FontWeight="Bold"
-                                        Style="{StaticResource BtnBase}"
-                                        Margin="4,0,0,0" Click="BtnClearClone_Click"/>
-                            </Grid>
-
-                            <!-- API Key row -->
-                            <Grid Grid.Row="1" Margin="0,6,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <CheckBox x:Name="chkShowApiKey" Grid.Column="0"
-                                          Content="🔑 API Key (ElevenLabs 10k/tháng)"
-                                          Checked="ChkShowApiKey_Changed"
-                                          Unchecked="ChkShowApiKey_Changed"/>
-                                <TextBox Grid.Column="1" x:Name="txtCloneApiKey"
-                                         Height="26" VerticalContentAlignment="Center"
-                                         FontSize="11" Margin="8,0,0,0"
-                                         Visibility="Collapsed"/>
-                            </Grid>
-
-                            <!-- Slang row -->
-                            <Grid Grid.Row="2" Margin="0,6,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="90"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Slang:" Foreground="#94A3B8"
-                                           FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                <TextBox Grid.Column="1" x:Name="txtSlangKey"
-                                         Height="26" FontSize="11" VerticalContentAlignment="Center"
-                                         ToolTip="Từ viết tắt: ae, ko, mí..."/>
-                                <TextBlock Grid.Column="2" Text=" → " Foreground="#94A3B8"
-                                           FontSize="13" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="3" x:Name="txtSlangValue"
-                                         Height="26" FontSize="11" VerticalContentAlignment="Center"
-                                         ToolTip="Cách đọc đầy đủ: anh em, không, mấy..."/>
-                                <Button Grid.Column="4" Content="＋"
-                                        Width="30" Height="26" Padding="0"
-                                        Background="#F59E0B" Foreground="#0F121C"
-                                        FontWeight="Bold" FontSize="15"
-                                        Style="{StaticResource BtnBase}"
-                                        Margin="4,0,0,0"
-                                        Click="BtnAddSlang_Click"
-                                        ToolTip="Thêm slang vào từ điển"/>
-                            </Grid>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </Border>
-        </Grid>
-
-        <!-- ══════════════════════════════════════════════════ -->
-        <!-- 4. CONTROL BAR                                     -->
-        <!-- ══════════════════════════════════════════════════ -->
-        <Border Grid.Row="4" Margin="8,0,8,8"
+        <Border Grid.Row="2" Margin="8,0,8,8"
                 Background="#1C2333" CornerRadius="6"
                 BorderBrush="#38455E" BorderThickness="1"
                 Padding="12,8">
@@ -625,58 +477,252 @@
         </Border>
 
         <!-- ══════════════════════════════════════════════════ -->
-        <!-- 5. STATUS BAR                                      -->
+        <!-- 3. UNIFIED MAIN CARD (TABS + STATUS + CONTENT)      -->
         <!-- ══════════════════════════════════════════════════ -->
-        <Border Grid.Row="5" Margin="8,0,8,6"
-                Background="#111622" CornerRadius="4"
-                BorderBrush="#38455E" BorderThickness="1"
-                Padding="12,6">
-            <Grid>
-                <TextBlock Text="{Binding StatusText}"
-                           FontSize="13" FontWeight="SemiBold"
-                           Foreground="#10B981" HorizontalAlignment="Left"
-                           VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding ConnectedPlatformsText}"
-                           FontSize="12" Foreground="#94A3B8"
-                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
-            </Grid>
-        </Border>
-
-        <!-- ══════════════════════════════════════════════════ -->
-        <!-- 6. CHAT LOG                                        -->
-        <!-- ══════════════════════════════════════════════════ -->
-        <Border Grid.Row="6" Style="{StaticResource SectionCard}" Margin="8,0,8,8">
+        <Border Grid.Row="3" Style="{StaticResource SectionCard}" Margin="8,0,8,8">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="38"/>  <!-- Unified Header: Tabs + Status -->
+                    <RowDefinition Height="*"/>   <!-- Content view -->
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="💬 " FontSize="13"/>
-                        <TextBlock Text="CHAT LOG" Foreground="#F59E0B"
-                                   FontSize="12" FontWeight="Bold"/>
-                    </StackPanel>
+                <!-- ── UNIFIED HEADER: TABS + STATUS TRONG 1 KHỐI DUY NHẤT ── -->
+                <Border Grid.Row="0" Style="{StaticResource SectionHeader}" Padding="8,4,14,4">
+                    <Grid>
+                        <!-- Left: Tab Buttons -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button x:Name="btnTabChat"
+                                    Style="{StaticResource BtnTabHeader}"
+                                    Background="#1C2333" BorderBrush="#38455E" BorderThickness="1,1,1,0"
+                                    Margin="0,0,6,0"
+                                    Click="BtnTabChat_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="💬 " FontSize="12" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTabChatLabel" Text="CHAT LOG" FontWeight="Bold" FontSize="12" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button x:Name="btnTabSettings"
+                                    Style="{StaticResource BtnTabHeader}"
+                                    Background="Transparent" BorderThickness="0"
+                                    Click="BtnTabSettings_Click">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="⚙ " FontSize="12" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTabSettingsLabel" Text="CÀI ĐẶT GIỌNG" FontWeight="SemiBold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Right: Status Indicators (Gộp từ StatusBar cũ vào đây) -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding StatusText}"
+                                       FontSize="12" FontWeight="SemiBold"
+                                       Foreground="#10B981" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                            <TextBlock Text="{Binding ConnectedPlatformsText}"
+                                       FontSize="12" Foreground="#94A3B8"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
 
-                <ListBox Grid.Row="1"
-                         ItemsSource="{Binding ChatLog}"
-                         Background="#0E121B"
-                         Foreground="#F1F5F9"
-                         BorderThickness="0"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border Padding="10,3" BorderBrush="#1C2333" BorderThickness="0,0,0,1">
-                                <TextBlock Text="{Binding DisplayText}"
-                                           FontFamily="Consolas" FontSize="12"
-                                           Foreground="#F1F5F9" TextWrapping="Wrap"/>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <!-- ── TAB CONTENTS ── -->
+                <Grid Grid.Row="1">
+                    <!-- TAB 1: CHAT LOG VIEW -->
+                    <Grid x:Name="viewChatLog" Visibility="Visible">
+                        <ListBox ItemsSource="{Binding ChatLog}"
+                                 Background="#0E121B"
+                                 Foreground="#F1F5F9"
+                                 BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="10,3" BorderBrush="#1C2333" BorderThickness="0,0,0,1">
+                                        <TextBlock Text="{Binding DisplayText}"
+                                                   FontFamily="Consolas" FontSize="12"
+                                                   Foreground="#F1F5F9" TextWrapping="Wrap"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+
+                    <!-- TAB 2: CÀI ĐẶT VIEW (Giọng đọc & Clone Slang) -->
+                    <Grid x:Name="viewSettings" Visibility="Collapsed" Background="#111622">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="3*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- 2A. GIỌNG ĐỌC / TTS -->
+                                <Border Grid.Column="0" Style="{StaticResource SectionCard}" Margin="0,0,6,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="🗣 " FontSize="13"/>
+                                                <TextBlock Text="GIỌNG ĐỌC" Foreground="#F59E0B"
+                                                           FontSize="12" FontWeight="Bold"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Grid.Row="1" Style="{StaticResource SectionBody}">
+                                            <Grid VerticalAlignment="Center">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="Giọng đọc:" Foreground="#94A3B8"
+                                                               FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding AvailableVoices}"
+                                                              SelectedValue="{Binding SelectedVoiceId}"
+                                                              SelectedValuePath="Id" Height="30"/>
+                                                </Grid>
+
+                                                <Grid Grid.Row="1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="Mẫu câu:" Foreground="#94A3B8"
+                                                               FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBox Grid.Column="1"
+                                                             Text="{Binding PrefixTemplate, UpdateSourceTrigger=PropertyChanged}"
+                                                             Height="30" VerticalContentAlignment="Center"
+                                                             ToolTip="VD: [{Platform}] {Username} nói: "/>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 2B. CLONE GIỌNG + SLANG -->
+                                <Border Grid.Column="1" Style="{StaticResource SectionCard}" Margin="6,0,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="🎤 " FontSize="13"/>
+                                                <TextBlock Text="CLONE GIỌNG &amp; SLANG" Foreground="#F59E0B"
+                                                           FontSize="12" FontWeight="Bold"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Grid.Row="1" Style="{StaticResource SectionBody}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Clone row -->
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="Clone:" Foreground="#94A3B8"
+                                                               FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <Button Grid.Column="1" Content="📁 File MP3"
+                                                            Height="28" Padding="8,4"
+                                                            Background="#262F42" Foreground="#F1F5F9"
+                                                            BorderBrush="#38455E" BorderThickness="1"
+                                                            FontSize="11" Style="{StaticResource BtnBase}"
+                                                            Click="BtnBrowseAudio_Click"/>
+                                                    <TextBox Grid.Column="2" x:Name="txtCloneFilePath"
+                                                             Height="28" VerticalContentAlignment="Center"
+                                                             FontSize="11" Margin="6,0"
+                                                             IsReadOnly="True" Text="Chưa chọn file"
+                                                             Foreground="#94A3B8"/>
+                                                    <Button Grid.Column="3" x:Name="btnCloneVoice"
+                                                            Content="▶ Clone"
+                                                            Height="28" Padding="10,4"
+                                                            Background="#10B981" Foreground="White"
+                                                            FontSize="11" FontWeight="Bold"
+                                                            Style="{StaticResource BtnBase}"
+                                                            IsEnabled="False" Click="BtnCloneVoice_Click"/>
+                                                    <Button Grid.Column="4" x:Name="btnClearClone"
+                                                            Content="✕ Xóa"
+                                                            Height="28" Padding="8,4"
+                                                            Background="#EF4444" Foreground="White"
+                                                            FontSize="11" FontWeight="Bold"
+                                                            Style="{StaticResource BtnBase}"
+                                                            Margin="4,0,0,0" Click="BtnClearClone_Click"/>
+                                                </Grid>
+
+                                                <!-- API Key row -->
+                                                <Grid Grid.Row="1" Margin="0,8,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <CheckBox x:Name="chkShowApiKey" Grid.Column="0"
+                                                              Content="🔑 API Key (ElevenLabs 10k/tháng)"
+                                                              Checked="ChkShowApiKey_Changed"
+                                                              Unchecked="ChkShowApiKey_Changed"/>
+                                                    <TextBox Grid.Column="1" x:Name="txtCloneApiKey"
+                                                             Height="26" VerticalContentAlignment="Center"
+                                                             FontSize="11" Margin="8,0,0,0"
+                                                             Visibility="Collapsed"/>
+                                                </Grid>
+
+                                                <!-- Slang row -->
+                                                <Grid Grid.Row="2" Margin="0,8,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="90"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="Slang:" Foreground="#94A3B8"
+                                                               FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                    <TextBox Grid.Column="1" x:Name="txtSlangKey"
+                                                             Height="26" FontSize="11" VerticalContentAlignment="Center"
+                                                             ToolTip="Từ viết tắt: ae, ko, mí..."/>
+                                                    <TextBlock Grid.Column="2" Text=" → " Foreground="#94A3B8"
+                                                               FontSize="13" VerticalAlignment="Center"/>
+                                                    <TextBox Grid.Column="3" x:Name="txtSlangValue"
+                                                             Height="26" FontSize="11" VerticalContentAlignment="Center"
+                                                             ToolTip="Cách đọc đầy đủ: anh em, không, mấy..."/>
+                                                    <Button Grid.Column="4" Content="＋"
+                                                            Width="30" Height="26" Padding="0"
+                                                            Background="#F59E0B" Foreground="#0F121C"
+                                                            FontWeight="Bold" FontSize="15"
+                                                            Style="{StaticResource BtnBase}"
+                                                            Margin="4,0,0,0"
+                                                            Click="BtnAddSlang_Click"
+                                                            ToolTip="Thêm slang vào từ điển"/>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
             </Grid>
         </Border>
     </Grid>
