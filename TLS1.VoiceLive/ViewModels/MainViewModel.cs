@@ -50,7 +50,7 @@ public class MainViewModel : INotifyPropertyChanged
     private static readonly HttpClient _aiHttpClient = new() { Timeout = TimeSpan.FromSeconds(15) };
     private bool _isAiReplyEnabled;
     private string _aiEndpoint = "http://192.168.100.154:20128/v1/chat/completions";
-    private string _aiApiKey = "sk_9router";
+    private string _aiApiKey = "sk-94f37e79b2d930fe-3qwzqr-6541de82";
     private string _aiModel = "main";
     private string _aiSystemPrompt = "Bạn là trợ lý AI livestream tiếng Việt thân thiện, hài hước, năng động. Hãy trả lời câu hỏi hoặc bình luận của khán giả cực kỳ ngắn gọn (chỉ 1 đến 2 câu ngắn, tối đa 30 từ), tự nhiên, dễ đọc thành tiếng.";
 
