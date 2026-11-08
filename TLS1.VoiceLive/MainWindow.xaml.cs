@@ -116,8 +116,7 @@ public partial class MainWindow : Window
         var apiKey = txtCloneApiKey.Text?.Trim();
         if (string.IsNullOrEmpty(apiKey))
         {
-            MessageBox.Show("Vui lòng tích 🔑 Nhập API Key.\n\nLấy key tại: elevenlabs.io → Profile → API Key\n(10k ký tự free/tháng)\n💡 Free: Coqui TTS, Piper TTS, RVC", "Thiếu API Key", MessageBoxButton.OK, MessageBoxImage.Warning);
-            chkShowApiKey.IsChecked = true;
+            MessageBox.Show("Vui lòng nhập API Key ElevenLabs.\n\nLấy key tại: elevenlabs.io → Profile → API Key\n(10k ký tự free/tháng)\n💡 Free: Coqui TTS, Piper TTS, RVC", "Thiếu API Key", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
         btnCloneVoice.IsEnabled = false; btnCloneVoice.Content = "⏳..."; txtCloneStatus.Text = "🔄 Đang clone...";
@@ -133,8 +132,6 @@ public partial class MainWindow : Window
         finally { btnCloneVoice.IsEnabled = true; btnCloneVoice.Content = "🔄 Clone"; }
     }
 
-    private void ChkShowApiKey_Changed(object sender, RoutedEventArgs e)
-        => txtCloneApiKey.Visibility = chkShowApiKey.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
 
     private void BtnHelp_Click(object sender, RoutedEventArgs e)
     {
@@ -202,12 +199,6 @@ public partial class MainWindow : Window
 
     private void BtnTabSettings_Click(object sender, RoutedEventArgs e) => SwitchTab(1);
 
-    private void BtnSettings_Click(object sender, RoutedEventArgs e)
-    {
-        var isSettingsActive = viewSettings.Visibility == Visibility.Visible;
-        SwitchTab(isSettingsActive ? 0 : 1);
-    }
-
     public void SwitchTab(int tabIndex)
     {
         if (viewChatLog == null || viewSettings == null) return;
@@ -232,8 +223,6 @@ public partial class MainWindow : Window
             btnTabSettings.BorderThickness = new Thickness(0);
             txtTabSettingsLabel.Foreground = inactiveFgBrush;
             txtTabSettingsLabel.FontWeight = FontWeights.SemiBold;
-
-            UpdateSettingsButtonVisual(false);
         }
         else
         {
@@ -250,27 +239,6 @@ public partial class MainWindow : Window
             btnTabSettings.BorderThickness = new Thickness(1, 1, 1, 0);
             txtTabSettingsLabel.Foreground = activeFgBrush;
             txtTabSettingsLabel.FontWeight = FontWeights.Bold;
-
-            UpdateSettingsButtonVisual(true);
-        }
-    }
-
-    private void UpdateSettingsButtonVisual(bool isOpen)
-    {
-        if (btnSettings == null || txtSettingsLabel == null) return;
-        if (isOpen)
-        {
-            btnSettings.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x3D, 0x2E, 0x0F));
-            btnSettings.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
-            btnSettings.BorderThickness = new Thickness(1.5);
-            txtSettingsLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
-        }
-        else
-        {
-            btnSettings.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0x2F, 0x42));
-            btnSettings.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x38, 0x45, 0x5E));
-            btnSettings.BorderThickness = new Thickness(1);
-            txtSettingsLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
         }
     }
 

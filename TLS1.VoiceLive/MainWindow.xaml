@@ -395,7 +395,6 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -450,21 +449,8 @@
                         Margin="0,0,8,0"
                         Command="{Binding ClearLogCommand}"/>
 
-                <Button Grid.Column="5" x:Name="btnSettings"
-                        Height="36" Padding="12,6"
-                        Background="#262F42" BorderBrush="#38455E" BorderThickness="1"
-                        Foreground="#F1F5F9"
-                        Style="{StaticResource BtnBase}"
-                        Click="BtnSettings_Click"
-                        ToolTip="Bật/Tắt bảng Cài đặt Giọng đọc &amp; Clone Slang">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="⚙" FontSize="14" Margin="0,0,6,0" Foreground="#F1F5F9" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="txtSettingsLabel" Text="Cài đặt" FontWeight="Bold" FontSize="12" Foreground="#F1F5F9" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
                 <!-- Stats -->
-                <StackPanel Grid.Column="6" Orientation="Horizontal"
+                <StackPanel Grid.Column="5" Orientation="Horizontal"
                             VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
                     <TextBlock Text="📊 " Foreground="#94A3B8" FontSize="13" VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding MessageCount}"
@@ -508,7 +494,7 @@
                                     Click="BtnTabSettings_Click">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="⚙ " FontSize="12" VerticalAlignment="Center"/>
-                                    <TextBlock x:Name="txtTabSettingsLabel" Text="CÀI ĐẶT GIỌNG" FontWeight="SemiBold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTabSettingsLabel" Text="Cài đặt" FontWeight="SemiBold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -631,6 +617,7 @@
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
 
                                                 <!-- Clone row -->
@@ -671,24 +658,21 @@
                                                             Margin="4,0,0,0" Click="BtnClearClone_Click"/>
                                                 </Grid>
 
-                                                <!-- API Key row -->
-                                                <Grid Grid.Row="1" Margin="0,8,0,0">
+                                                <!-- 2. API Key row (Giãn cách riêng biệt, hiện ô nhập luôn) -->
+                                                <Grid Grid.Row="1" Margin="0,16,0,0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <CheckBox x:Name="chkShowApiKey" Grid.Column="0"
-                                                              Content="🔑 API Key (ElevenLabs 10k/tháng)"
-                                                              Checked="ChkShowApiKey_Changed"
-                                                              Unchecked="ChkShowApiKey_Changed"/>
+                                                    <TextBlock Grid.Column="0" Text="🔑 API Key (ElevenLabs 10k/tháng):" Foreground="#94A3B8"
+                                                               FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                     <TextBox Grid.Column="1" x:Name="txtCloneApiKey"
-                                                             Height="26" VerticalContentAlignment="Center"
-                                                             FontSize="11" Margin="8,0,0,0"
-                                                             Visibility="Collapsed"/>
+                                                             Height="28" VerticalContentAlignment="Center"
+                                                             FontSize="11"/>
                                                 </Grid>
 
-                                                <!-- Slang row -->
-                                                <Grid Grid.Row="2" Margin="0,8,0,0">
+                                                <!-- 3. Slang row (Giãn cách riêng biệt) -->
+                                                <Grid Grid.Row="2" Margin="0,16,0,0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="90"/>
@@ -699,15 +683,15 @@
                                                     <TextBlock Grid.Column="0" Text="Slang:" Foreground="#94A3B8"
                                                                FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                                     <TextBox Grid.Column="1" x:Name="txtSlangKey"
-                                                             Height="26" FontSize="11" VerticalContentAlignment="Center"
+                                                             Height="28" FontSize="11" VerticalContentAlignment="Center"
                                                              ToolTip="Từ viết tắt: ae, ko, mí..."/>
                                                     <TextBlock Grid.Column="2" Text=" → " Foreground="#94A3B8"
                                                                FontSize="13" VerticalAlignment="Center"/>
                                                     <TextBox Grid.Column="3" x:Name="txtSlangValue"
-                                                             Height="26" FontSize="11" VerticalContentAlignment="Center"
+                                                             Height="28" FontSize="11" VerticalContentAlignment="Center"
                                                              ToolTip="Cách đọc đầy đủ: anh em, không, mấy..."/>
                                                     <Button Grid.Column="4" Content="＋"
-                                                            Width="30" Height="26" Padding="0"
+                                                            Width="32" Height="28" Padding="0"
                                                             Background="#F59E0B" Foreground="#0F121C"
                                                             FontWeight="Bold" FontSize="15"
                                                             Style="{StaticResource BtnBase}"
@@ -715,6 +699,14 @@
                                                             Click="BtnAddSlang_Click"
                                                             ToolTip="Thêm slang vào từ điển"/>
                                                 </Grid>
+
+                                                <!-- 4. 9Router AI Slang Normalizer Banner -->
+                                                <Border Grid.Row="3" Margin="0,14,0,0" Background="#161F2E" BorderBrush="#2A3850" BorderThickness="1" CornerRadius="4" Padding="8,6">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="✨ " FontSize="12" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="AI 9Router tự động chuẩn hóa Teencode &amp; Slang mượt mà trước khi phát âm" Foreground="#10B981" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
                                             </Grid>
                                         </Border>
                                     </Grid>

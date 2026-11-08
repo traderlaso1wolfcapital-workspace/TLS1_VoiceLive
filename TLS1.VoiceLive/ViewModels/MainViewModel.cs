@@ -314,11 +314,14 @@ public class MainViewModel : INotifyPropertyChanged
         if (IsMuted) return;
         try
         {
+            // Tự động chuẩn hóa Slang & Teencode bằng 9Router AI trước khi phát âm
+            var normalizedContent = await NormalizeSlangAndTeencodeAsync(content);
+
             if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
-                await edgeTts.SpeakCommentAsync(username, content);
+                await edgeTts.SpeakCommentAsync(username, normalizedContent);
             else
             {
-                var textToSpeak = FormatSpeechText(platform, username, content);
+                var textToSpeak = FormatSpeechText(platform, username, normalizedContent);
                 await _ttsEngine.SpeakAsync(textToSpeak);
             }
         }
@@ -326,6 +329,95 @@ public class MainViewModel : INotifyPropertyChanged
         {
             Serilog.Log.Error(ex, "Lỗi phát âm thanh bình luận");
         }
+    }
+
+    private async Task<string> NormalizeSlangAndTeencodeAsync(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return text;
+
+        // Rút gọn các ký tự lặp kéo dài (vd: "đẹp quáaaaa" -> "đẹp quá", "helooooo" -> "heloo")
+        var cleaned = Regex.Replace(text, @"(.)\1{3,}", "$1$1").Trim();
+
+        // Nếu quá ngắn (< 3 ký tự) hoặc chỉ toàn số thì không cần gọi AI
+        if (cleaned.Length < 3 || cleaned.All(char.IsDigit)) return cleaned;
+
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1500)); // Timeout 1.5s để không làm trễ live
+            var normalized = await RequestSlangNormalizationFrom9RouterAsync(cleaned, cts.Token);
+            if (!string.IsNullOrWhiteSpace(normalized))
+            {
+                return normalized;
+            }
+        }
+        catch
+        {
+            // Bỏ qua nếu lỗi mạng hoặc timeout, dùng text sạch
+        }
+
+        return cleaned;
+    }
+
+    private async Task<string?> RequestSlangNormalizationFrom9RouterAsync(string text, CancellationToken token)
+    {
+        try
+        {
+            var payload = new
+            {
+                model = string.IsNullOrWhiteSpace(_aiModel) ? "main" : _aiModel,
+                messages = new object[]
+                {
+                    new
+                    {
+                        role = "system",
+                        content = "Bạn là bộ chuẩn hóa ngôn ngữ livestream tiếng Việt. " +
+                                  "Nhiệm vụ: Chuyển các từ viết tắt, teencode, tiếng lóng mạng xã hội và crypto trong câu sang tiếng Việt tự nhiên đầy đủ để giọng đọc AI phát âm chuẩn nhất. " +
+                                  "Quy tắc tối thượng: Chỉ trả về duy nhất câu đã chuẩn hóa, tuyệt đối không trả lời câu hỏi, không thêm bớt nội dung, không chào hỏi, không thêm icon."
+                    },
+                    new { role = "user", content = text }
+                },
+                max_tokens = 60,
+                temperature = 0.2,
+                stream = false
+            };
+
+            var jsonContent = JsonSerializer.Serialize(payload);
+            using var request = new HttpRequestMessage(HttpMethod.Post, _aiEndpoint);
+            if (!string.IsNullOrWhiteSpace(_aiApiKey))
+            {
+                request.Headers.Add("Authorization", $"Bearer {_aiApiKey}");
+            }
+            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            var response = await _aiHttpClient.SendAsync(request, token);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var respString = await response.Content.ReadAsStringAsync(token);
+            using var doc = JsonDocument.Parse(respString);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("choices", out var choices) && choices.GetArrayLength() > 0)
+            {
+                var firstChoice = choices[0];
+                if (firstChoice.TryGetProperty("message", out var msgObj) && msgObj.TryGetProperty("content", out var contentElem))
+                {
+                    var result = contentElem.GetString();
+                    if (!string.IsNullOrWhiteSpace(result))
+                    {
+                        result = Regex.Replace(result, @"<think>.*?</think>", "", RegexOptions.Singleline);
+                        result = result.Replace("*", "").Replace("#", "").Replace("`", "").Replace("\"", "").Trim();
+                        return result;
+                    }
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Warning(ex, "Lỗi chuẩn hóa slang qua 9Router");
+        }
+        return null;
     }
 
     private void StartScraperForSource(LiveSource source)
