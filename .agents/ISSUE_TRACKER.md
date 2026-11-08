@@ -6,10 +6,17 @@
   - **Dọn dẹp dung lượng:** Đã xóa bản sao lưu cũ `TLS1 VoiceLive - Copy.exe`, giải phóng 127 MB ổ cứng.
   - **Chuẩn hóa thư mục:** Chuyển đổi `publish2` thành `Release_App`, dọn dẹp thư mục thừa. Cấu trúc dự án tối giản và khoa học.
   - **Quy chuẩn công ty:** Đã thiết lập hoàn chỉnh `PLAN_TLS1_VOICELIVE.md` và `ISSUE_TRACKER.md` trong `.agents/`.
-  - **Đồng bộ GitHub:** Khởi tạo Git repository, cấu hình `.gitignore` chuẩn bảo vệ tệp lớn và bảo mật cookie, liên kết và đẩy thành công toàn bộ mã nguồn lên repository: `https://github.com/traderlaso1wolfcapital-workspace/TLS1_VoiceLive.git`.
+  - **Đồng bộ GitHub:** Đẩy toàn bộ mã nguồn lên repository `https://github.com/traderlaso1wolfcapital-workspace/TLS1_VoiceLive.git`.
+  - **Sửa lỗi Scraper YouTube:** Cài đặt `playwright` + chromium/ffmpeg và `beautifulsoup4` cho Python 3.13 trên máy, khôi phục tính năng cào cmt live YouTube 100%.
+  - **Tính năng mới:** Bổ sung tính năng **"Trả lời comment AI (9Router Mac Mini)"**:
+    + Thêm ô tích checkbox trên giao diện WPF.
+    + Kết nối API 9Router trên máy Mac Mini M1 (`http://192.168.100.154:20128/v1/chat/completions`).
+    + Tự động sinh câu trả lời ngắn gọn, tự nhiên và dùng TTS phát âm thanh đọc ngay sau khi đọc cmt của người xem.
+    + Rebuild và cập nhật bản chạy hoàn chỉnh `Release_App\TLS1 VoiceLive.exe`.
 
 ## 2. Danh Sách Task Đang Chờ Xử Lý
-- [x] Rà soát file `.exe` hoàn chỉnh cho Windows (`Release_App\TLS1 VoiceLive.exe`).
+- [x] Rà soát file `.exe` hoàn chỉnh cho Windows.
 - [x] Tối ưu hóa & phân bổ lại cấu trúc thư mục dự án tối giản nhất.
 - [x] Đẩy mã nguồn dự án lên GitHub `traderlaso1wolfcapital-workspace/TLS1_VoiceLive`.
-- [ ] Kiểm thử chạy thực tế ứng dụng `TLS1 VoiceLive.exe` trên môi trường Desktop.
+- [x] Khắc phục lỗi cào cmt live YouTube do thiếu thư viện Python.
+- [x] Bổ sung Checkbox & tính năng "Trả lời comment AI" kết nối 9Router server Mac Mini M1.

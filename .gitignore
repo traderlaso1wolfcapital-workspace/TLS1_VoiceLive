@@ -1,6 +1,8 @@
 # .NET Build artifacts
 [Bb]in/
 [Oo]bj/
+build_bin/
+build_obj/
 [Ll]ogs/
 *.user
 *.suo

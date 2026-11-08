@@ -381,9 +381,10 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -396,7 +397,7 @@
                                           SelectedValuePath="Id" Height="30"/>
                             </Grid>
 
-                            <Grid Grid.Row="1">
+                            <Grid Grid.Row="1" Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -407,6 +408,16 @@
                                          Text="{Binding PrefixTemplate, UpdateSourceTrigger=PropertyChanged}"
                                          Height="30" VerticalContentAlignment="Center"
                                          ToolTip="VD: [{Platform}] {Username} nói: "/>
+                            </Grid>
+
+                            <!-- Checkbox Trả lời comment AI -->
+                            <Grid Grid.Row="2" Margin="0,2,0,0">
+                                <CheckBox x:Name="chkAiReply"
+                                          IsChecked="{Binding IsAiReplyEnabled, Mode=TwoWay}"
+                                          Content="🤖 Trả lời comment AI (9Router Mac Mini)"
+                                          Foreground="#FFAA00" FontWeight="SemiBold"
+                                          FontSize="12" VerticalAlignment="Center"
+                                          ToolTip="Tự động dùng AI 9Router trên Mac Mini M1 để trả lời ngắn gọn và đọc to câu trả lời"/>
                             </Grid>
                         </Grid>
                     </Border>
