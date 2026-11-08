@@ -143,7 +143,7 @@ public partial class MainWindow : Window
         btnMute.Content = _muted ? "🔇" : "🔊";
         btnMute.Background = _muted
             ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xEF, 0x44, 0x44))
-            : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x2A, 0x2E, 0x39));
+            : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0x2F, 0x42));
         _viewModel.GetTtsEngine()?.SetMuted(_muted);
         txtCloneStatus.Text = _muted ? "🔇 Đã tắt âm thanh" : "🔊 Đã bật âm thanh";
     }

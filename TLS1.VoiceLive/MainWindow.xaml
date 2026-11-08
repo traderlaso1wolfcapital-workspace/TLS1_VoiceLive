@@ -7,7 +7,7 @@
         Width="1000" Height="840"
         MinWidth="820" MinHeight="640"
         WindowStartupLocation="CenterScreen"
-        Background="#131722"
+        Background="#0F121C"
         FontFamily="Segoe UI">
 
     <Window.Resources>
@@ -40,8 +40,8 @@
                                 <Setter TargetName="bd" Property="Opacity" Value="0.70"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="bd" Property="Background" Value="#2A2E39"/>
-                                <Setter Property="Foreground" Value="#50535E"/>
+                                <Setter TargetName="bd" Property="Background" Value="#222A3C"/>
+                                <Setter Property="Foreground" Value="#525E75"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -49,12 +49,12 @@
             </Setter>
         </Style>
 
-        <!-- ── TEXTBOX ── -->
+        <!-- ── TEXTBOX (Inset lõm sâu vào card) ── -->
         <Style TargetType="TextBox">
             <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="Background" Value="#161824"/>
-            <Setter Property="Foreground" Value="#D1D4DC"/>
-            <Setter Property="BorderBrush" Value="#2A2E39"/>
+            <Setter Property="Background" Value="#111622"/>
+            <Setter Property="Foreground" Value="#F1F5F9"/>
+            <Setter Property="BorderBrush" Value="#38455E"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CaretBrush" Value="#F59E0B"/>
             <Setter Property="Padding" Value="8,4"/>
@@ -69,11 +69,11 @@
 
         <!-- ── COMBOBOX ── -->
         <ControlTemplate x:Key="CbToggle" TargetType="ToggleButton">
-            <Border x:Name="bd" Background="#161824" BorderBrush="#2A2E39" BorderThickness="1" CornerRadius="4">
+            <Border x:Name="bd" Background="#111622" BorderBrush="#38455E" BorderThickness="1" CornerRadius="4">
                 <Grid>
                     <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,24,0"/>
                     <Path HorizontalAlignment="Right" VerticalAlignment="Center"
-                          Data="M0,0L4,4L8,0" Stroke="#787B86" StrokeThickness="1.5"
+                          Data="M0,0L4,4L8,0" Stroke="#94A3B8" StrokeThickness="1.5"
                           Fill="Transparent" Margin="0,0,8,0"/>
                 </Grid>
             </Border>
@@ -97,8 +97,8 @@
                        IsOpen="{TemplateBinding IsDropDownOpen}"
                        AllowsTransparency="True" Focusable="False">
                     <Grid MinWidth="{TemplateBinding ActualWidth}" MaxHeight="220">
-                        <Border Background="#1E222D" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4"/>
-                        <ScrollViewer Margin="2" Background="#1E222D">
+                        <Border Background="#1C2333" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4"/>
+                        <ScrollViewer Margin="2" Background="#1C2333">
                             <StackPanel IsItemsHost="True"/>
                         </ScrollViewer>
                     </Grid>
@@ -108,13 +108,13 @@
 
         <Style TargetType="ComboBox">
             <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="Foreground" Value="#D1D4DC"/>
+            <Setter Property="Foreground" Value="#F1F5F9"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Template" Value="{StaticResource CbTemplate}"/>
             <Setter Property="ItemContainerStyle">
                 <Setter.Value>
                     <Style TargetType="ComboBoxItem">
-                        <Setter Property="Foreground" Value="#D1D4DC"/>
+                        <Setter Property="Foreground" Value="#F1F5F9"/>
                         <Setter Property="Padding" Value="10,7"/>
                         <Setter Property="Template">
                             <Setter.Value>
@@ -125,10 +125,10 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="bd" Property="Background" Value="#2A2E39"/>
+                                            <Setter TargetName="bd" Property="Background" Value="#2D374D"/>
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="bd" Property="Background" Value="#2A2E39"/>
+                                            <Setter TargetName="bd" Property="Background" Value="#2D374D"/>
                                             <Setter Property="Foreground" Value="#F59E0B"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
@@ -152,7 +152,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#1E222D"/>
+                                <Setter TargetName="bd" Property="Background" Value="#1C2333"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -162,26 +162,26 @@
 
         <!-- ── CHECKBOX ── -->
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#787B86"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- ── SECTION CARD (nổi khối rõ theo chuẩn autotrader.fun) ── -->
+        <!-- ── SECTION CARD (Nâng tone sáng #1C2333, viền nét #38455E nổi bật hẳn trên nền #0F121C) ── -->
         <Style x:Key="SectionCard" TargetType="Border">
-            <Setter Property="Background" Value="#1E222D"/>
+            <Setter Property="Background" Value="#1C2333"/>
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Margin" Value="8,0,8,8"/>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="BorderBrush" Value="#2A2E39"/>
+            <Setter Property="BorderBrush" Value="#38455E"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
-        <!-- Section header bar -->
+        <!-- Section header bar (Tone sáng nổi bật #252E42 làm rõ thanh Tab) -->
         <Style x:Key="SectionHeader" TargetType="Border">
-            <Setter Property="Background" Value="#161824"/>
-            <Setter Property="BorderBrush" Value="#2A2E39"/>
+            <Setter Property="Background" Value="#252E42"/>
+            <Setter Property="BorderBrush" Value="#38455E"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="CornerRadius" Value="5,5,0,0"/>
             <Setter Property="Padding" Value="12,7"/>
@@ -191,6 +191,7 @@
         <Style x:Key="SectionBody" TargetType="Border">
             <Setter Property="Padding" Value="12,10"/>
         </Style>
+
         <!-- STOP button (Màu đỏ chuẩn trading) -->
         <Style x:Key="BtnStopStyle" TargetType="Button" BasedOn="{StaticResource BtnBase}">
             <Setter Property="Background" Value="#EF4444"/>
@@ -199,8 +200,8 @@
             <Setter Property="FontSize" Value="14"/>
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#2A2E39"/>
-                    <Setter Property="Foreground" Value="#50535E"/>
+                    <Setter Property="Background" Value="#222A3C"/>
+                    <Setter Property="Foreground" Value="#525E75"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -223,8 +224,8 @@
         <!-- ══════════════════════════════════════════════════ -->
         <!-- 0. TITLE BAR                                       -->
         <!-- ══════════════════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#131722"
-                BorderBrush="#2A2E39" BorderThickness="0,0,0,1">
+        <Border Grid.Row="0" Background="#0F121C"
+                BorderBrush="#262E3F" BorderThickness="0,0,0,1">
             <Grid Margin="14,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="🔊" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -232,11 +233,11 @@
                         <Run Text="TLS1" Foreground="#F59E0B"/>
                         <Run Text=" Voice Live" Foreground="White"/>
                     </TextBlock>
-                    <TextBlock Text=" v2.2" FontSize="11" Foreground="#787B86"
+                    <TextBlock Text=" v2.2" FontSize="11" Foreground="#94A3B8"
                                VerticalAlignment="Bottom" Margin="0,0,0,2"/>
                 </StackPanel>
                 <TextBlock x:Name="txtCloneStatus" HorizontalAlignment="Right" VerticalAlignment="Center"
-                           FontSize="12" Foreground="#787B86"/>
+                           FontSize="12" Foreground="#94A3B8"/>
             </Grid>
         </Border>
 
@@ -258,7 +259,7 @@
                         <TextBlock Text="NGUỒN LIVESTREAM" Foreground="#F59E0B"
                                    FontSize="12" FontWeight="Bold"/>
                         <TextBlock Text="  — Thêm YouTube, TikTok, Twitch..." 
-                                   Foreground="#787B86" FontSize="11" VerticalAlignment="Center"/>
+                                   Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
@@ -276,20 +277,20 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" Text="Nền tảng:" Foreground="#787B86"
+                        <TextBlock Grid.Column="0" Text="Nền tảng:" Foreground="#94A3B8"
                                    FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <ComboBox Grid.Column="1" x:Name="cbPlatform"
                                   ItemsSource="{Binding AvailablePlatforms}"
                                   SelectedItem="{Binding SelectedPlatform}"
                                   Height="32"
                                   SelectionChanged="CbPlatform_SelectionChanged"/>
-                        <TextBlock Grid.Column="2" Text="Kênh / ID:" Foreground="#787B86"
+                        <TextBlock Grid.Column="2" Text="Kênh / ID:" Foreground="#94A3B8"
                                    FontSize="13" VerticalAlignment="Center" Margin="10,0,8,0"/>
                         <TextBox Grid.Column="3"
                                  Text="{Binding ChannelName, UpdateSourceTrigger=PropertyChanged}"
                                  Height="30" VerticalContentAlignment="Center"
                                  ToolTip="Tên kênh, Video ID, Room ID..."/>
-                        <TextBlock Grid.Column="4" Text="URL / Link:" Foreground="#787B86"
+                        <TextBlock Grid.Column="4" Text="URL / Link:" Foreground="#94A3B8"
                                    FontSize="13" VerticalAlignment="Center" Margin="10,0,8,0"/>
                         <TextBox Grid.Column="5"
                                  Text="{Binding LivestreamUrl, UpdateSourceTrigger=PropertyChanged}"
@@ -298,7 +299,8 @@
                                  ToolTip="Dán link YouTube/TikTok hoặc wss://..."/>
                         <!-- Help button -->
                         <Button Grid.Column="6" Content="?" Width="30" Height="30"
-                                Background="#2A2E39" Foreground="#F59E0B"
+                                Background="#262F42" Foreground="#F59E0B"
+                                BorderBrush="#38455E" BorderThickness="1"
                                 FontWeight="Bold" FontSize="14"
                                 Style="{StaticResource BtnBase}"
                                 Padding="0" Margin="4,0,0,0"
@@ -317,16 +319,16 @@
 
                 <!-- Source list (luôn hiển thị, tự ẩn khi rỗng qua MinHeight) -->
                 <Border Grid.Row="2"
-                        Background="#131722"
+                        Background="#111622"
                         CornerRadius="0,0,5,5"
                         Padding="10,6"
                         MinHeight="0">
                     <ItemsControl ItemsSource="{Binding LiveSources}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:LiveSource}">
-                                <Border Background="#161824" CornerRadius="4"
+                                <Border Background="#1C2333" CornerRadius="4"
                                         Padding="10,5" Margin="0,0,0,4"
-                                        BorderBrush="#2A2E39" BorderThickness="1">
+                                        BorderBrush="#38455E" BorderThickness="1">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                              <ColumnDefinition Width="*"/>
@@ -334,7 +336,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding DisplayText}"
-                                                   Foreground="#D1D4DC" FontSize="12"
+                                                   Foreground="#F1F5F9" FontSize="12"
                                                    VerticalAlignment="Center"/>
                                         <Button Grid.Column="1"
                                                 Content="✕" Width="22" Height="22"
@@ -391,7 +393,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Giọng đọc:" Foreground="#787B86"
+                                <TextBlock Grid.Column="0" Text="Giọng đọc:" Foreground="#94A3B8"
                                            FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                 <ComboBox Grid.Column="1"
                                           ItemsSource="{Binding AvailableVoices}"
@@ -404,7 +406,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Mẫu câu:" Foreground="#787B86"
+                                <TextBlock Grid.Column="0" Text="Mẫu câu:" Foreground="#94A3B8"
                                            FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                 <TextBox Grid.Column="1"
                                          Text="{Binding PrefixTemplate, UpdateSourceTrigger=PropertyChanged}"
@@ -459,18 +461,19 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Clone:" Foreground="#787B86"
+                                <TextBlock Grid.Column="0" Text="Clone:" Foreground="#94A3B8"
                                            FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <Button Grid.Column="1" Content="📁 File MP3"
                                         Height="28" Padding="8,4"
-                                        Background="#2A2E39" Foreground="#D1D4DC"
+                                        Background="#262F42" Foreground="#F1F5F9"
+                                        BorderBrush="#38455E" BorderThickness="1"
                                         FontSize="11" Style="{StaticResource BtnBase}"
                                         Click="BtnBrowseAudio_Click"/>
                                 <TextBox Grid.Column="2" x:Name="txtCloneFilePath"
                                          Height="28" VerticalContentAlignment="Center"
                                          FontSize="11" Margin="6,0"
                                          IsReadOnly="True" Text="Chưa chọn file"
-                                         Foreground="#787B86"/>
+                                         Foreground="#94A3B8"/>
                                 <Button Grid.Column="3" x:Name="btnCloneVoice"
                                         Content="▶ Clone"
                                         Height="28" Padding="10,4"
@@ -512,19 +515,19 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Slang:" Foreground="#787B86"
+                                <TextBlock Grid.Column="0" Text="Slang:" Foreground="#94A3B8"
                                            FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                 <TextBox Grid.Column="1" x:Name="txtSlangKey"
                                          Height="26" FontSize="11" VerticalContentAlignment="Center"
                                          ToolTip="Từ viết tắt: ae, ko, mí..."/>
-                                <TextBlock Grid.Column="2" Text=" → " Foreground="#787B86"
+                                <TextBlock Grid.Column="2" Text=" → " Foreground="#94A3B8"
                                            FontSize="13" VerticalAlignment="Center"/>
                                 <TextBox Grid.Column="3" x:Name="txtSlangValue"
                                          Height="26" FontSize="11" VerticalContentAlignment="Center"
                                          ToolTip="Cách đọc đầy đủ: anh em, không, mấy..."/>
                                 <Button Grid.Column="4" Content="＋"
                                         Width="30" Height="26" Padding="0"
-                                        Background="#F59E0B" Foreground="#131722"
+                                        Background="#F59E0B" Foreground="#0F121C"
                                         FontWeight="Bold" FontSize="15"
                                         Style="{StaticResource BtnBase}"
                                         Margin="4,0,0,0"
@@ -541,8 +544,8 @@
         <!-- 4. CONTROL BAR                                     -->
         <!-- ══════════════════════════════════════════════════ -->
         <Border Grid.Row="4" Margin="8,0,8,8"
-                Background="#1E222D" CornerRadius="6"
-                BorderBrush="#2A2E39" BorderThickness="1"
+                Background="#1C2333" CornerRadius="6"
+                BorderBrush="#38455E" BorderThickness="1"
                 Padding="12,8">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -573,7 +576,8 @@
 
                 <Button Grid.Column="2" x:Name="btnMute"
                         Content="🔊" Width="40" Height="36"
-                        Background="#2A2E39" Foreground="#D1D4DC"
+                        Background="#262F42" BorderBrush="#38455E" BorderThickness="1"
+                        Foreground="#F1F5F9"
                         FontSize="16" Padding="0"
                         Style="{StaticResource BtnBase}"
                         Margin="0,0,8,0"
@@ -582,7 +586,8 @@
                 <Button Grid.Column="3"
                         Content="🗑 Xóa log"
                         Height="36" Padding="14,6"
-                        Background="#2A2E39" Foreground="#D1D4DC"
+                        Background="#262F42" BorderBrush="#38455E" BorderThickness="1"
+                        Foreground="#F1F5F9"
                         FontSize="12"
                         Style="{StaticResource BtnBase}"
                         Command="{Binding ClearLogCommand}"/>
@@ -590,11 +595,11 @@
                 <!-- Stats -->
                 <StackPanel Grid.Column="4" Orientation="Horizontal"
                             VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
-                    <TextBlock Text="📊 " Foreground="#787B86" FontSize="13" VerticalAlignment="Center"/>
+                    <TextBlock Text="📊 " Foreground="#94A3B8" FontSize="13" VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding MessageCount}"
                                FontWeight="Bold" Foreground="#F59E0B"
                                FontSize="15" VerticalAlignment="Center"/>
-                    <TextBlock Text=" bình luận" Foreground="#787B86"
+                    <TextBlock Text=" bình luận" Foreground="#94A3B8"
                                FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
@@ -604,8 +609,8 @@
         <!-- 5. STATUS BAR                                      -->
         <!-- ══════════════════════════════════════════════════ -->
         <Border Grid.Row="5" Margin="8,0,8,6"
-                Background="#161824" CornerRadius="4"
-                BorderBrush="#2A2E39" BorderThickness="1"
+                Background="#111622" CornerRadius="4"
+                BorderBrush="#38455E" BorderThickness="1"
                 Padding="12,6">
             <Grid>
                 <TextBlock Text="{Binding StatusText}"
@@ -613,7 +618,7 @@
                            Foreground="#10B981" HorizontalAlignment="Left"
                            VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding ConnectedPlatformsText}"
-                           FontSize="12" Foreground="#787B86"
+                           FontSize="12" Foreground="#94A3B8"
                            HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
         </Border>
@@ -638,17 +643,17 @@
 
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding ChatLog}"
-                         Background="#131722"
-                         Foreground="#D1D4DC"
+                         Background="#0E121B"
+                         Foreground="#F1F5F9"
                          BorderThickness="0"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="10,3" BorderBrush="#1E222D" BorderThickness="0,0,0,1">
+                            <Border Padding="10,3" BorderBrush="#1C2333" BorderThickness="0,0,0,1">
                                 <TextBlock Text="{Binding DisplayText}"
                                            FontFamily="Consolas" FontSize="12"
-                                           Foreground="#D1D4DC" TextWrapping="Wrap"/>
+                                           Foreground="#F1F5F9" TextWrapping="Wrap"/>
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
