@@ -172,6 +172,7 @@ public partial class MainWindow : Window
             btnAiReply.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
             btnAiReply.BorderThickness = new Thickness(1.5);
             txtAiIcon.Text = "🤖";
+            txtAiIcon.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
             txtAiLabel.Text = "CMT AI";
             txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
         }
@@ -181,8 +182,9 @@ public partial class MainWindow : Window
             btnAiReply.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x38, 0x45, 0x5E));
             btnAiReply.BorderThickness = new Thickness(1);
             txtAiIcon.Text = "🤖";
+            txtAiIcon.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
             txtAiLabel.Text = "CMT AI";
-            txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x94, 0xA3, 0xB8));
+            txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
         }
     }
 

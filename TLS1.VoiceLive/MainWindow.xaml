@@ -576,13 +576,14 @@
                 <Button Grid.Column="3" x:Name="btnAiReply"
                         Height="36" Padding="12,6"
                         Background="#262F42" BorderBrush="#38455E" BorderThickness="1"
+                        Foreground="#F1F5F9"
                         Style="{StaticResource BtnBase}"
                         Margin="0,0,8,0"
                         Click="BtnToggleAiReply_Click"
                         ToolTip="Bật/Tắt chế độ AI tự động trả lời comment (9Router Mac Mini)">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock x:Name="txtAiIcon" Text="🤖" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="txtAiLabel" Text="CMT AI" FontWeight="Bold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtAiIcon" Text="🤖" FontSize="14" Margin="0,0,6,0" Foreground="#F1F5F9" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtAiLabel" Text="CMT AI" FontWeight="Bold" FontSize="12" Foreground="#F1F5F9" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
