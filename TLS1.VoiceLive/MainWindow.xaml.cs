@@ -19,6 +19,14 @@ public partial class MainWindow : Window
         InitializeComponent();
         _viewModel = viewModel;
         DataContext = viewModel;
+        UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled);
+        _viewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(MainViewModel.IsAiReplyEnabled))
+            {
+                Dispatcher.Invoke(() => UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled));
+            }
+        };
     }
 
     private void CbPlatform_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -146,6 +154,36 @@ public partial class MainWindow : Window
             : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0x2F, 0x42));
         _viewModel.GetTtsEngine()?.SetMuted(_muted);
         txtCloneStatus.Text = _muted ? "🔇 Đã tắt âm thanh" : "🔊 Đã bật âm thanh";
+    }
+
+    private void BtnToggleAiReply_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.IsAiReplyEnabled = !_viewModel.IsAiReplyEnabled;
+        UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled);
+    }
+
+    private void UpdateAiReplyButtonVisual(bool enabled)
+    {
+        if (btnAiReply == null || txtAiIcon == null || txtAiLabel == null) return;
+
+        if (enabled)
+        {
+            btnAiReply.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x3D, 0x2E, 0x0F));
+            btnAiReply.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
+            btnAiReply.BorderThickness = new Thickness(1.5);
+            txtAiIcon.Text = "🤖";
+            txtAiLabel.Text = "CMT AI";
+            txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
+        }
+        else
+        {
+            btnAiReply.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0x2F, 0x42));
+            btnAiReply.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x38, 0x45, 0x5E));
+            btnAiReply.BorderThickness = new Thickness(1);
+            txtAiIcon.Text = "🤖";
+            txtAiLabel.Text = "CMT AI";
+            txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x94, 0xA3, 0xB8));
+        }
     }
 
     private void BtnAddSlang_Click(object sender, RoutedEventArgs e)
