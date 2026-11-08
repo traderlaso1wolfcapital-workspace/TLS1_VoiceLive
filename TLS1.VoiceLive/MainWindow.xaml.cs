@@ -21,6 +21,7 @@ public partial class MainWindow : Window
         DataContext = viewModel;
         UpdateAiReplyButtonVisual(_viewModel.IsAiReplyEnabled);
         UpdateMuteButtonVisual(_viewModel.IsMuted);
+        UpdateSettingsButtonVisual(pnlSettings.Visibility == Visibility.Visible);
         _viewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(MainViewModel.IsAiReplyEnabled))
@@ -194,6 +195,32 @@ public partial class MainWindow : Window
             txtAiIcon.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
             txtAiLabel.Text = "Trả lời AI";
             txtAiLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
+        }
+    }
+
+    private void BtnSettings_Click(object sender, RoutedEventArgs e)
+    {
+        var isVisible = pnlSettings.Visibility == Visibility.Visible;
+        pnlSettings.Visibility = isVisible ? Visibility.Collapsed : Visibility.Visible;
+        UpdateSettingsButtonVisual(!isVisible);
+    }
+
+    private void UpdateSettingsButtonVisual(bool isOpen)
+    {
+        if (btnSettings == null || txtSettingsLabel == null) return;
+        if (isOpen)
+        {
+            btnSettings.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x3D, 0x2E, 0x0F));
+            btnSettings.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
+            btnSettings.BorderThickness = new Thickness(1.5);
+            txtSettingsLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
+        }
+        else
+        {
+            btnSettings.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x26, 0x2F, 0x42));
+            btnSettings.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x38, 0x45, 0x5E));
+            btnSettings.BorderThickness = new Thickness(1);
+            txtSettingsLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF1, 0xF5, 0xF9));
         }
     }
 

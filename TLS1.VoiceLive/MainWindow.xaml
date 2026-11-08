@@ -356,9 +356,9 @@
         </Border>
 
         <!-- ══════════════════════════════════════════════════ -->
-        <!-- 2. GIỌNG ĐỌC & CLONE / SLANG (SIDE BY SIDE)        -->
+        <!-- 2. CÀI ĐẶT: GIỌNG ĐỌC & CLONE / SLANG (ẨN MẶC ĐỊNH) -->
         <!-- ══════════════════════════════════════════════════ -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" x:Name="pnlSettings" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="3*"/>
@@ -543,6 +543,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -594,10 +595,24 @@
                         Foreground="#F1F5F9"
                         FontSize="12"
                         Style="{StaticResource BtnBase}"
+                        Margin="0,0,8,0"
                         Command="{Binding ClearLogCommand}"/>
 
+                <Button Grid.Column="5" x:Name="btnSettings"
+                        Height="36" Padding="12,6"
+                        Background="#262F42" BorderBrush="#38455E" BorderThickness="1"
+                        Foreground="#F1F5F9"
+                        Style="{StaticResource BtnBase}"
+                        Click="BtnSettings_Click"
+                        ToolTip="Bật/Tắt bảng Cài đặt Giọng đọc &amp; Clone Slang">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="⚙" FontSize="14" Margin="0,0,6,0" Foreground="#F1F5F9" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtSettingsLabel" Text="Cài đặt" FontWeight="Bold" FontSize="12" Foreground="#F1F5F9" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
                 <!-- Stats -->
-                <StackPanel Grid.Column="5" Orientation="Horizontal"
+                <StackPanel Grid.Column="6" Orientation="Horizontal"
                             VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
                     <TextBlock Text="📊 " Foreground="#94A3B8" FontSize="13" VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding MessageCount}"
