@@ -47,12 +47,28 @@ public class MainViewModel : INotifyPropertyChanged
     public ObservableCollection<PlatformInfo> AvailablePlatforms { get; } = new();
     public ObservableCollection<LiveSource> LiveSources { get; } = new();
 
-    private static readonly HttpClient _aiHttpClient = new() { Timeout = TimeSpan.FromSeconds(15) };
+    private static readonly HttpClient _aiHttpClient = new() { Timeout = TimeSpan.FromSeconds(10) };
     private bool _isAiReplyEnabled;
+    private CancellationTokenSource? _aiReplyCts;
+    private int _isProcessingAiReply = 0;
+    private DateTime _lastAiReplyTime = DateTime.MinValue;
+    private static readonly HashSet<string> _ignoredBotUsers = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "nightbot", "streamlabs", "moobot", "streamelements", "tiktoklive", "system", "hệ thống", "bot"
+    };
+    private static readonly Regex _spamPattern = new(@"^[\s\p{P}\p{S}:;)(/\\=+\-_><~]+$", RegexOptions.Compiled);
+
     private string _aiEndpoint = "http://192.168.100.154:20128/v1/chat/completions";
     private string _aiApiKey = "sk-94f37e79b2d930fe-3qwzqr-6541de82";
     private string _aiModel = "main";
-    private string _aiSystemPrompt = "Bạn là trợ lý AI livestream tiếng Việt thân thiện, hài hước, năng động. Hãy trả lời câu hỏi hoặc bình luận của khán giả cực kỳ ngắn gọn (chỉ 1 đến 2 câu ngắn, tối đa 30 từ), tự nhiên, dễ đọc thành tiếng.";
+    private string _aiSystemPrompt = 
+        "Bạn là trợ lý AI thông minh trong phòng livestream tiếng Việt. " +
+        "Nhiệm vụ: Trả lời hoặc giao lưu ngắn gọn với khán giả cực kỳ tự nhiên, hóm hỉnh như người thật. " +
+        "Quy tắc bắt buộc: " +
+        "1. Trả lời CỰC KỲ NGẮN GỌN (chỉ đúng 1 câu, tối đa 15-20 từ). " +
+        "2. Đi thẳng vào câu trả lời, TUYỆT ĐỐI KHÔNG mở đầu bằng 'Tôi là AI', 'AI nói', 'Chào bạn'. " +
+        "3. Xưng hô tự nhiên (em/tui, gọi khán giả bằng tên hoặc bác). " +
+        "4. Tuyệt đối không dùng emoji, icon, hay ký tự markdown (*, #, `) để giọng đọc phát âm mượt.";
 
     public bool IsAiReplyEnabled
     {
@@ -62,7 +78,23 @@ public class MainViewModel : INotifyPropertyChanged
             if (_isAiReplyEnabled == value) return;
             _isAiReplyEnabled = value;
             OnPropertyChanged();
-            AddLogEntry("HỆ THỐNG", value ? "🤖 Đã BẬT chế độ: Trả lời comment AI (9Router Mac Mini)" : "⚪ Đã TẮT chế độ: Trả lời comment AI", "SYSTEM");
+
+            if (value)
+            {
+                _aiReplyCts?.Cancel();
+                _aiReplyCts?.Dispose();
+                _aiReplyCts = new CancellationTokenSource();
+                AddLogEntry("HỆ THỐNG", "🤖 Đã BẬT chế độ: Trả lời comment AI (9Router Mac Mini)", "SYSTEM");
+            }
+            else
+            {
+                // Dừng ngay lập tức toàn bộ tiến trình trả lời của AI
+                _aiReplyCts?.Cancel();
+                _aiReplyCts?.Dispose();
+                _aiReplyCts = null;
+                Interlocked.Exchange(ref _isProcessingAiReply, 0);
+                AddLogEntry("HỆ THỐNG", "⚪ Đã TẮT chế độ: Trả lời comment AI", "SYSTEM");
+            }
         }
     }
 
@@ -125,6 +157,11 @@ public class MainViewModel : INotifyPropertyChanged
             _aiSystemPrompt = configuration["AiReply:SystemPrompt"] ?? _aiSystemPrompt;
             if (bool.TryParse(configuration["AiReply:Enabled"], out var enabled))
                 _isAiReplyEnabled = enabled;
+        }
+
+        if (_isAiReplyEnabled)
+        {
+            _aiReplyCts = new CancellationTokenSource();
         }
 
         LoadVoices();
@@ -298,6 +335,8 @@ public class MainViewModel : INotifyPropertyChanged
     {
         IsRunning = false;
         _demoCts?.Cancel();
+        _aiReplyCts?.Cancel();
+        Interlocked.Exchange(ref _isProcessingAiReply, 0);
         (_ttsEngine as TLS1.AI.Engines.EdgeTtsEngine)?.CancelAll();
         _tikTokBridge?.Stop();
         _tikTokBridge?.Dispose();
@@ -426,14 +465,51 @@ public class MainViewModel : INotifyPropertyChanged
         _tikTokBridge = bridge; // Lưu lại để StopAsync
     }
 
+    private bool ShouldAiReply(string username, string userComment)
+    {
+        if (string.IsNullOrWhiteSpace(userComment)) return false;
+
+        // Bỏ qua bot livestream
+        var cleanUser = username.Trim().TrimStart('@');
+        if (_ignoredBotUsers.Contains(cleanUser)) return false;
+        if (cleanUser.Contains("bot", StringComparison.OrdinalIgnoreCase)) return false;
+
+        var trimmed = userComment.Trim();
+        // Bỏ qua cmt quá ngắn (< 5 ký tự)
+        if (trimmed.Length < 5) return false;
+
+        // Bỏ qua cmt chỉ toàn emoji hoặc ký tự đặc biệt (vd: :))) @@ ??? !!!)
+        if (_spamPattern.IsMatch(trimmed)) return false;
+
+        // Bỏ qua chuỗi cười hoặc spam ký tự vô nghĩa lặp lại (vd: hahaha, kkkk, hehehe)
+        if (Regex.IsMatch(trimmed, @"^(ha|he|hi|ho|k|a|h){3,}$", RegexOptions.IgnoreCase)) return false;
+
+        // Cooldown tối thiểu 6 giây giữa 2 lần AI trả lời để không lấn át streamer
+        if ((DateTime.Now - _lastAiReplyTime).TotalSeconds < 6) return false;
+
+        return true;
+    }
+
     private async Task ProcessAiReplyAsync(string username, string userComment)
     {
+        if (!IsAiReplyEnabled) return;
+        var cts = _aiReplyCts;
+        if (cts == null || cts.IsCancellationRequested) return;
+
+        if (!ShouldAiReply(username, userComment)) return;
+
+        // Đảm bảo chỉ 1 câu trả lời AI được xử lý tại một thời điểm
+        if (Interlocked.CompareExchange(ref _isProcessingAiReply, 1, 0) != 0) return;
+
         try
         {
-            if (string.IsNullOrWhiteSpace(userComment) || userComment.Length < 2) return;
+            var reply = await RequestAiReplyFrom9RouterAsync(username, userComment, cts.Token);
+            
+            // Kiểm tra trạng thái hủy ngay sau khi nhận phản hồi (người dùng có thể vừa bỏ tích)
+            if (!IsAiReplyEnabled || cts.IsCancellationRequested || string.IsNullOrWhiteSpace(reply))
+                return;
 
-            var reply = await RequestAiReplyFrom9RouterAsync(username, userComment);
-            if (string.IsNullOrWhiteSpace(reply)) return;
+            _lastAiReplyTime = DateTime.Now;
 
             _dispatcher.Invoke(() =>
             {
@@ -448,22 +524,27 @@ public class MainViewModel : INotifyPropertyChanged
                 while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
             });
 
-            if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
-            {
-                await edgeTts.SpeakCommentAsync("AI", reply);
-            }
-            else
-            {
-                await _ttsEngine.SpeakAsync($"AI nói: {reply}");
-            }
+            // Kiểm tra trạng thái hủy lần nữa trước khi phát tiếng
+            if (!IsAiReplyEnabled || cts.IsCancellationRequested) return;
+
+            // Đọc trực tiếp câu trả lời của AI một cách tự nhiên, KHÔNG có tiền tố "AI nói là"
+            await _ttsEngine.SpeakAsync(reply);
+        }
+        catch (OperationCanceledException)
+        {
+            // Bị hủy khi người dùng bỏ tích checkbox
         }
         catch (Exception ex)
         {
             Serilog.Log.Error(ex, "Lỗi khi xử lý trả lời comment AI từ 9Router");
         }
+        finally
+        {
+            Interlocked.Exchange(ref _isProcessingAiReply, 0);
+        }
     }
 
-    private async Task<string?> RequestAiReplyFrom9RouterAsync(string username, string userComment)
+    private async Task<string?> RequestAiReplyFrom9RouterAsync(string username, string userComment, CancellationToken token)
     {
         try
         {
@@ -475,7 +556,8 @@ public class MainViewModel : INotifyPropertyChanged
                     new { role = "system", content = _aiSystemPrompt },
                     new { role = "user", content = $"{username}: {userComment}" }
                 },
-                max_tokens = 80,
+                max_tokens = 60,
+                temperature = 0.7,
                 stream = false
             };
 
@@ -487,15 +569,15 @@ public class MainViewModel : INotifyPropertyChanged
             }
             request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _aiHttpClient.SendAsync(request);
+            var response = await _aiHttpClient.SendAsync(request, token);
             if (!response.IsSuccessStatusCode)
             {
-                var err = await response.Content.ReadAsStringAsync();
+                var err = await response.Content.ReadAsStringAsync(token);
                 Serilog.Log.Warning("9Router trả về mã lỗi {StatusCode}: {Error}", response.StatusCode, err);
                 return null;
             }
 
-            var respString = await response.Content.ReadAsStringAsync();
+            var respString = await response.Content.ReadAsStringAsync(token);
             using var doc = JsonDocument.Parse(respString);
             var root = doc.RootElement;
             if (root.TryGetProperty("choices", out var choices) && choices.GetArrayLength() > 0)
@@ -512,6 +594,10 @@ public class MainViewModel : INotifyPropertyChanged
                     }
                 }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Request bị hủy
         }
         catch (Exception ex)
         {
