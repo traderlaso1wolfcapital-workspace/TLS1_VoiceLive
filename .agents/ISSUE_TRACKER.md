@@ -24,3 +24,9 @@
 - [x] Khắc phục lỗi không phát ra âm thanh do thiếu driver `NAudio 2.3.0`.
 - [x] Bổ sung Checkbox & tính năng "Trả lời comment AI" kết nối 9Router server Mac Mini M1.
 - [x] Cập nhật API Key mới `sk-94f37e79b2d930fe-3qwzqr-6541de82` (TLS1_VoiceLive).
+- [x] Đổi tone màu giao diện chuẩn autotrader.fun Dark Slate `#0F121C` / `#1C2333`.
+- [x] Khắc phục triệt để lỗi Not Responding khi click Mute âm thanh.
+- [x] Gộp thanh trạng thái và CHAT LOG làm 1 khối duy nhất.
+- [x] Chuyển đổi Cài đặt thành dạng Tab View, di chuyển nút Cài đặt xuống thanh tab.
+- [x] Tách biệt 3 cụm Clone - ElevenLabs Key - Slang, hiện trực tiếp ô nhập ElevenLabs Key.
+- [x] Tích hợp AI 9Router tự động chuẩn hóa Teencode & Slang thông minh trước khi phát âm.
