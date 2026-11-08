@@ -1,0 +1,27 @@
+# .NET Build artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]ogs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Release distribution builds (>100MB executable cannot be pushed to GitHub)
+Release_App/
+publish/
+publish2/
+
+# Browser profile and sensitive session data
+tiktok_profile/
+**/tiktok_profile/
+
+# Logs and temp files
+*.log
+crash_log.txt
+
+# OS / IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
