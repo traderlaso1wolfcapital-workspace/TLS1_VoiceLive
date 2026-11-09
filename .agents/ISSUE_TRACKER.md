@@ -35,3 +35,6 @@
 - [x] Thêm delay 5 giây cho mỗi lần đọc comment và trả lời AI qua hàng đợi SemaphoreSlim.
 - [x] Nâng tốc độ giọng đọc Edge TTS lên 1.3x trong cả code và appsettings.json.
 - [x] Định dạng đọc từng số riêng lẻ trong tên người xem (ví dụ Giang11241 -> "Giang một một hai bốn một").
+- [x] Thêm khung cấu hình Prompt trả lời AI (9Router Mac Mini) trực quan trên giao diện với nút "↺ Khôi phục mặc định".
+- [x] Khóa chặt chu trình tuần tự: Đọc cmt -> Chờ AI trả lời & đọc xong âm thanh -> Nghỉ 5s rồi mới cho phép đọc câu cmt tiếp theo.
+- [x] Rebuild và xuất bản file .exe mới nhất vào `Release_App\TLS1 VoiceLive.exe`.

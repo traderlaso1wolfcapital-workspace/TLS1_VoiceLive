@@ -63,15 +63,29 @@ public class MainViewModel : INotifyPropertyChanged
     private string _aiEndpoint = "http://192.168.100.154:20128/v1/chat/completions";
     private string _aiApiKey = "sk-94f37e79b2d930fe-3qwzqr-6541de82";
     private string _aiModel = "main";
-    private string _aiSystemPrompt = 
-        "Bạn là trợ lý AI thông minh trong phòng livestream tiếng Việt. " +
-        "Nhiệm vụ: Trả lời hoặc giao lưu ngắn gọn với khán giả cực kỳ tự nhiên, hóm hỉnh như người thật. " +
-        "Quy tắc bắt buộc: " +
-        "1. Trả lời CỰC KỲ NGẮN GỌN (chỉ đúng 1 câu, tối đa 15-20 từ). " +
-        "2. Đi thẳng vào câu trả lời, TUYỆT ĐỐI KHÔNG mở đầu bằng 'Tôi là AI', 'AI nói', 'Chào bạn'. " +
-        "3. Xưng hô tự nhiên (em/tui, gọi khán giả bằng tên hoặc bác). " +
-        "4. Tuyệt đối không dùng emoji, icon, hay ký tự markdown (*, #, `) để giọng đọc phát âm mượt. " +
+
+    public const string DefaultAiSystemPrompt = 
+        "Bạn là trợ lý AI thông minh trong phòng livestream tiếng Việt.\n" +
+        "Nhiệm vụ: Trả lời hoặc giao lưu ngắn gọn với khán giả cực kỳ tự nhiên, hóm hỉnh như người thật.\n" +
+        "Quy tắc bắt buộc:\n" +
+        "1. Trả lời CỰC KỲ NGẮN GỌN (chỉ đúng 1 câu, tối đa 15-20 từ).\n" +
+        "2. Đi thẳng vào câu trả lời, TUYỆT ĐỐI KHÔNG mở đầu bằng 'Tôi là AI', 'AI nói', 'Chào bạn'.\n" +
+        "3. Xưng hô tự nhiên (em/tui, gọi khán giả bằng tên hoặc bác).\n" +
+        "4. Tuyệt đối không dùng emoji, icon, hay ký tự markdown (*, #, `) để giọng đọc phát âm mượt.\n" +
         "5. Khi gọi tên khán giả có chứa số (vd: Giang11241), chỉ gọi tên chữ cái ngắn gọn (vd: bác Giang) hoặc phát âm riêng lẻ từng số, không đọc thành hàng nghìn hay chục nghìn.";
+
+    private string _aiSystemPrompt = DefaultAiSystemPrompt;
+
+    public string AiSystemPrompt
+    {
+        get => _aiSystemPrompt;
+        set
+        {
+            if (_aiSystemPrompt == value) return;
+            _aiSystemPrompt = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool IsAiReplyEnabled
     {
@@ -160,6 +174,7 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand ClearLogCommand { get; }
     public ICommand AddSourceCommand { get; }
     public ICommand RemoveSourceCommand { get; }
+    public ICommand ResetPromptCommand { get; }
 
     public TLS1.AI.Engines.EdgeTtsEngine? GetTtsEngine()
         => _ttsEngine as TLS1.AI.Engines.EdgeTtsEngine;
@@ -206,6 +221,7 @@ public class MainViewModel : INotifyPropertyChanged
         ClearLogCommand = new RelayCommand(() => ChatLog.Clear());
         AddSourceCommand = new RelayCommand(AddSource);
         RemoveSourceCommand = new RelayCommand<LiveSource>(RemoveSource);
+        ResetPromptCommand = new RelayCommand(() => AiSystemPrompt = DefaultAiSystemPrompt);
 
         _chatAggregator.OnMessageAggregated += OnChatMessageReceived;
         _chatAggregator.ConnectionStatusChanged += OnConnectionStatusChanged;
@@ -534,13 +550,13 @@ public class MainViewModel : INotifyPropertyChanged
             // 1. Phát âm thanh đọc bình luận (đã có chuẩn hóa 9Router AI)
             await SpeakChatMessageAsync(platform, username, content);
 
-            // 2. Nếu có bật Trả lời AI:
+            // 2. Nếu có bật Trả lời AI: Chờ AI trả lời câu này xong xuôi
             if (IsAiReplyEnabled && ShouldAiReply(username, content))
             {
-                // Delay đúng 5 giây trước khi AI trả lời theo yêu cầu của CEO
+                // Cho một nhịp nghỉ 1 giây ngắn tự nhiên giữa câu cmt và câu AI đáp
                 try
                 {
-                    await Task.Delay(5000, token);
+                    await Task.Delay(1000, token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -549,10 +565,12 @@ public class MainViewModel : INotifyPropertyChanged
 
                 if (!IsRunning || !IsAiReplyEnabled || IsMuted || token.IsCancellationRequested) return;
 
+                // Xử lý và đọc câu trả lời AI (phát xong âm thanh câu này mới chạy tiếp)
                 await ProcessAiReplyAsync(username, content);
             }
 
-            // 3. Delay đúng 5 giây sau mỗi lần đọc xong trước khi nhường lượt cho cmt kế tiếp theo yêu cầu của CEO
+            // 3. Sau khi AI trả lời xong (hoặc đọc xong cmt nếu không bật AI):
+            // Nghỉ 5 giây rồi MỚI ĐƯỢC giải phóng lock cho cmt tiếp theo được đọc!
             try
             {
                 await Task.Delay(5000, token);
@@ -755,17 +773,12 @@ public class MainViewModel : INotifyPropertyChanged
         if (cleanUser.Contains("bot", StringComparison.OrdinalIgnoreCase)) return false;
 
         var trimmed = userComment.Trim();
-        // Bỏ qua cmt quá ngắn (< 5 ký tự)
-        if (trimmed.Length < 5) return false;
 
         // Bỏ qua cmt chỉ toàn emoji hoặc ký tự đặc biệt (vd: :))) @@ ??? !!!)
         if (_spamPattern.IsMatch(trimmed)) return false;
 
         // Bỏ qua chuỗi cười hoặc spam ký tự vô nghĩa lặp lại (vd: hahaha, kkkk, hehehe)
         if (Regex.IsMatch(trimmed, @"^(ha|he|hi|ho|k|a|h){3,}$", RegexOptions.IgnoreCase)) return false;
-
-        // Cooldown tối thiểu 5 giây giữa 2 lần AI trả lời để không lấn át streamer
-        if ((DateTime.Now - _lastAiReplyTime).TotalSeconds < 5) return false;
 
         return true;
     }
@@ -775,8 +788,6 @@ public class MainViewModel : INotifyPropertyChanged
         if (!IsAiReplyEnabled) return;
         var cts = _aiReplyCts;
         if (cts == null || cts.IsCancellationRequested) return;
-
-        if (!ShouldAiReply(username, userComment)) return;
 
         // Đảm bảo chỉ 1 câu trả lời AI được xử lý tại một thời điểm
         if (Interlocked.CompareExchange(ref _isProcessingAiReply, 1, 0) != 0) return;

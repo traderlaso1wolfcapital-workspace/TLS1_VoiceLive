@@ -533,14 +533,21 @@
                         </ListBox>
                     </Grid>
 
-                    <!-- TAB 2: CÀI ĐẶT VIEW (Giọng đọc & Clone Slang) -->
+                    <!-- TAB 2: CÀI ĐẶT VIEW (Giọng đọc & Clone Slang & Prompt AI) -->
                     <Grid x:Name="viewSettings" Visibility="Collapsed" Background="#111622">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <Grid Margin="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="3*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- ROW 0: 2 Cột Cài đặt Giọng và Clone Slang -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
 
                                 <!-- 2A. GIỌNG ĐỌC / TTS -->
                                 <Border Grid.Column="0" Style="{StaticResource SectionCard}" Margin="0,0,6,0">
@@ -707,6 +714,54 @@
                                                         <TextBlock Text="AI 9Router tự động chuẩn hóa Teencode &amp; Slang mượt mà trước khi phát âm" Foreground="#10B981" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                                     </StackPanel>
                                                 </Border>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                                <!-- ROW 1: PROMPT TRẢ LỜI AI (9Router Mac Mini) -->
+                                <Border Grid.Row="1" Style="{StaticResource SectionCard}" Margin="0,10,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
+                                            <Grid>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="🤖 " FontSize="13"/>
+                                                    <TextBlock Text="PROMPT TRẢ LỜI AI (9Router Mac Mini)" Foreground="#F59E0B"
+                                                               FontSize="12" FontWeight="Bold"/>
+                                                    <TextBlock Text=" — Tùy biến phong cách và công thức đối đáp của AI"
+                                                               Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <Button HorizontalAlignment="Right" Content="↺ Khôi phục mặc định"
+                                                        Height="24" Padding="10,2"
+                                                        Background="#262F42" Foreground="#F1F5F9"
+                                                        BorderBrush="#38455E" BorderThickness="1"
+                                                        FontSize="11" Style="{StaticResource BtnBase}"
+                                                        Command="{Binding ResetPromptCommand}"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <Border Grid.Row="1" Style="{StaticResource SectionBody}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBox Grid.Row="0"
+                                                         Text="{Binding AiSystemPrompt, UpdateSourceTrigger=PropertyChanged}"
+                                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                                         MinHeight="85" MaxHeight="160"
+                                                         VerticalScrollBarVisibility="Auto"
+                                                         FontSize="12" Padding="8,6"
+                                                         ToolTip="Nhập prompt chỉ dẫn cho AI trả lời comment"/>
+                                                <TextBlock Grid.Row="1" Margin="2,6,0,0"
+                                                           Text="💡 Mẹo: Yêu cầu AI trả lời thật ngắn gọn (1 câu, dưới 20 từ), xưng hô thân mật (bác/em), không dùng emoji hay markdown để giọng đọc phát âm mượt mà nhất."
+                                                           Foreground="#64748B" FontSize="11"/>
                                             </Grid>
                                         </Border>
                                     </Grid>
