@@ -262,7 +262,25 @@
                     <TextBlock Text=" v2.2" FontSize="11" Foreground="#94A3B8"
                                VerticalAlignment="Bottom" Margin="0,0,0,2"/>
                 </StackPanel>
-                <TextBlock x:Name="txtCloneStatus" HorizontalAlignment="Right" VerticalAlignment="Center"
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtCloneStatus" VerticalAlignment="Center"
+                               FontSize="12" Foreground="#94A3B8" Margin="0,0,16,0"/>
+
+                    <!-- 🌐 BỘ CHỌN NGÔN NGỮ (VI / EN / ZH / JA / KO) -->
+                    <Border Background="#1C2333" BorderBrush="#38455E" BorderThickness="1" CornerRadius="4" Padding="6,2">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="🌐" FontSize="13" VerticalAlignment="Center" Margin="2,0,6,0"/>
+                            <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                      SelectedItem="{Binding SelectedLanguage}"
+                                      Width="135" Height="26"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      FontSize="12" FontWeight="SemiBold"
+                                      VerticalContentAlignment="Center"
+                                      ToolTip="Chọn ngôn ngữ giao diện &amp; giọng đọc (Language)"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
                            FontSize="12" Foreground="#94A3B8"/>
             </Grid>
         </Border>
@@ -282,9 +300,8 @@
                 <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="📡 " FontSize="13"/>
-                        <TextBlock Text="NGUỒN LIVESTREAM" Foreground="#F59E0B"
+                        <TextBlock Text="{Binding UiPlatformHeader}" Foreground="#F59E0B"
                                    FontSize="12" FontWeight="Bold"/>
-                        <TextBlock Text="  — Thêm YouTube, TikTok, Twitch..." 
                                    Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
@@ -303,20 +320,20 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" Text="Nền tảng:" Foreground="#94A3B8"
+                        <TextBlock Grid.Column="0" Text="{Binding UiPlatformLabel}" Foreground="#94A3B8"
                                    FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <ComboBox Grid.Column="1" x:Name="cbPlatform"
                                   ItemsSource="{Binding AvailablePlatforms}"
                                   SelectedItem="{Binding SelectedPlatform}"
                                   Height="32"
                                   SelectionChanged="CbPlatform_SelectionChanged"/>
-                        <TextBlock Grid.Column="2" Text="Kênh / ID:" Foreground="#94A3B8"
+                        <TextBlock Grid.Column="2" Text="{Binding UiChannelLabel}" Foreground="#94A3B8"
                                    FontSize="13" VerticalAlignment="Center" Margin="10,0,8,0"/>
                         <TextBox Grid.Column="3"
                                  Text="{Binding ChannelName, UpdateSourceTrigger=PropertyChanged}"
                                  Height="30" VerticalContentAlignment="Center"
                                  ToolTip="Tên kênh, Video ID, Room ID..."/>
-                        <TextBlock Grid.Column="4" Text="URL / Link:" Foreground="#94A3B8"
+                        <TextBlock Grid.Column="4" Text="{Binding UiUrlLabel}" Foreground="#94A3B8"
                                    FontSize="13" VerticalAlignment="Center" Margin="10,0,8,0"/>
                         <TextBox Grid.Column="5"
                                  Text="{Binding LivestreamUrl, UpdateSourceTrigger=PropertyChanged}"
@@ -333,7 +350,7 @@
                                 Click="BtnHelp_Click" ToolTip="Hướng dẫn lấy URL"/>
                         <!-- Add source button -->
                         <Button Grid.Column="7"
-                                Content="＋  Thêm nguồn"
+                                Content="{Binding UiAddSource}"
                                 Height="30" Padding="14,4"
                                 Background="#10B981" Foreground="White"
                                 FontWeight="Bold" FontSize="12"
@@ -399,7 +416,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0"
-                        Content="▶  BẮT ĐẦU"
+                        Content="{Binding UiStart}"
                         Width="130" Height="36"
                         Background="#10B981" Foreground="White"
                         FontWeight="Bold" FontSize="14"
@@ -409,7 +426,7 @@
                         Margin="0,0,8,0"/>
 
                 <Button Grid.Column="1"
-                        Content="⏹  DỪNG"
+                        Content="{Binding UiStop}"
                         Width="110" Height="36"
                         Style="{StaticResource BtnStopStyle}"
                         Command="{Binding StopCommand}"
@@ -435,12 +452,12 @@
                         ToolTip="Bật/Tắt chế độ AI tự động trả lời comment (9Router Mac Mini)">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock x:Name="txtAiIcon" Text="🤖" FontSize="14" Margin="0,0,6,0" Foreground="#F1F5F9" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="txtAiLabel" Text="Trả lời AI" FontWeight="Bold" FontSize="12" Foreground="#F1F5F9" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtAiLabel" Text="{Binding UiAiReply}" FontWeight="Bold" FontSize="12" Foreground="#F1F5F9" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
                 <Button Grid.Column="4"
-                        Content="🗑 Xóa log"
+                        Content="{Binding UiClearLog}"
                         Height="36" Padding="14,6"
                         Background="#262F42" BorderBrush="#38455E" BorderThickness="1"
                         Foreground="#F1F5F9"
@@ -456,7 +473,7 @@
                     <TextBlock Text="{Binding MessageCount}"
                                FontWeight="Bold" Foreground="#F59E0B"
                                FontSize="15" VerticalAlignment="Center"/>
-                    <TextBlock Text=" bình luận" Foreground="#94A3B8"
+                    <TextBlock Text="{Binding UiCommentsCountSuffix}" Foreground="#94A3B8"
                                FontSize="13" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
@@ -484,7 +501,7 @@
                                     Click="BtnTabChat_Click">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="💬 " FontSize="12" VerticalAlignment="Center"/>
-                                    <TextBlock x:Name="txtTabChatLabel" Text="CHAT LOG" FontWeight="Bold" FontSize="12" Foreground="#F59E0B" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTabChatLabel" Text="{Binding UiTabChat}" FontWeight="Bold" FontSize="12" Foreground="#F59E0B" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
 
@@ -494,7 +511,7 @@
                                     Click="BtnTabSettings_Click">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="⚙ " FontSize="12" VerticalAlignment="Center"/>
-                                    <TextBlock x:Name="txtTabSettingsLabel" Text="Cài đặt" FontWeight="SemiBold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTabSettingsLabel" Text="{Binding UiTabSettings}" FontWeight="SemiBold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -560,7 +577,10 @@
                                         <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="🗣 " FontSize="13"/>
-                                                <TextBlock Text="GIỌNG ĐỌC" Foreground="#F59E0B"
+                                                <TextBlock Text="{Binding UiCardVoiceHeader}" Foreground="#F59E0B"
+                                                           FontSize="12" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding UiCardVoiceSub}" Foreground="#94A3B8"
+                                                           FontSize="11" VerticalAlignment="Center"/>
                                                            FontSize="12" FontWeight="Bold"/>
                                             </StackPanel>
                                         </Border>
@@ -577,7 +597,7 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="Giọng đọc:" Foreground="#94A3B8"
+                                                    <TextBlock Grid.Column="0" Text="{Binding UiVoiceLabel}" Foreground="#94A3B8"
                                                                FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                                     <ComboBox Grid.Column="1"
                                                               ItemsSource="{Binding AvailableVoices}"
@@ -613,7 +633,7 @@
                                         <Border Grid.Row="0" Style="{StaticResource SectionHeader}">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="🎤 " FontSize="13"/>
-                                                <TextBlock Text="CLONE GIỌNG &amp; SLANG" Foreground="#F59E0B"
+                                                <TextBlock Text="{Binding UiCardCloneHeader}" Foreground="#F59E0B"
                                                            FontSize="12" FontWeight="Bold"/>
                                             </StackPanel>
                                         </Border>
@@ -636,9 +656,9 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="Clone:" Foreground="#94A3B8"
+                                                    <TextBlock Grid.Column="0" Text="{Binding UiCloneLabel}" Foreground="#94A3B8"
                                                                FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                    <Button Grid.Column="1" Content="📁 File MP3"
+                                                    <Button Grid.Column="1" Content="{Binding UiBrowseBtn}"
                                                             Height="28" Padding="8,4"
                                                             Background="#262F42" Foreground="#F1F5F9"
                                                             BorderBrush="#38455E" BorderThickness="1"
@@ -657,7 +677,7 @@
                                                             Style="{StaticResource BtnBase}"
                                                             IsEnabled="False" Click="BtnCloneVoice_Click"/>
                                                     <Button Grid.Column="4" x:Name="btnClearClone"
-                                                            Content="✕ Xóa"
+                                                            Content="{Binding UiClearCloneBtn}"
                                                             Height="28" Padding="8,4"
                                                             Background="#EF4444" Foreground="White"
                                                             FontSize="11" FontWeight="Bold"
@@ -671,7 +691,7 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="🔑 API Key (ElevenLabs 10k/tháng):" Foreground="#94A3B8"
+                                                    <TextBlock Grid.Column="0" Text="{Binding UiElevenLabsKeyLabel}" Foreground="#94A3B8"
                                                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                     <TextBox Grid.Column="1" x:Name="txtCloneApiKey"
                                                              Height="28" VerticalContentAlignment="Center"
@@ -687,7 +707,7 @@
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="Slang:" Foreground="#94A3B8"
+                                                    <TextBlock Grid.Column="0" Text="{Binding UiSlangLabel}" Foreground="#94A3B8"
                                                                FontSize="13" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                                     <TextBox Grid.Column="1" x:Name="txtSlangKey"
                                                              Height="28" FontSize="11" VerticalContentAlignment="Center"
@@ -732,12 +752,12 @@
                                             <Grid>
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                     <TextBlock Text="🤖 " FontSize="13"/>
-                                                    <TextBlock Text="PROMPT TRẢ LỜI AI (9Router Mac Mini)" Foreground="#F59E0B"
+                                                    <TextBlock Text="{Binding UiCardPromptHeader}" Foreground="#F59E0B"
                                                                FontSize="12" FontWeight="Bold"/>
-                                                    <TextBlock Text=" — Tùy biến phong cách và công thức đối đáp của AI"
+                                                    <TextBlock Text="{Binding UiPromptDesc}"
                                                                Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center"/>
                                                 </StackPanel>
-                                                <Button HorizontalAlignment="Right" Content="↺ Khôi phục mặc định"
+                                                <Button HorizontalAlignment="Right" Content="{Binding UiResetPromptBtn}"
                                                         Height="24" Padding="10,2"
                                                         Background="#262F42" Foreground="#F1F5F9"
                                                         BorderBrush="#38455E" BorderThickness="1"

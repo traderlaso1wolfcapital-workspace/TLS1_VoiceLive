@@ -49,6 +49,105 @@ public class MainViewModel : INotifyPropertyChanged
     public ObservableCollection<PlatformInfo> AvailablePlatforms { get; } = new();
     public ObservableCollection<LiveSource> LiveSources { get; } = new();
 
+    // ── NGÔN NGỮ GIAO DIỆN & GIỌNG ĐỌC (LOCALIZATION) ──
+    public ObservableCollection<LanguageInfo> AvailableLanguages { get; } = new();
+    private LanguageInfo _selectedLanguage = null!;
+    public LanguageInfo SelectedLanguage
+    {
+        get => _selectedLanguage;
+        set
+        {
+            if (_selectedLanguage == value || value == null) return;
+            _selectedLanguage = value;
+            OnPropertyChanged();
+            ApplyLanguage(value);
+        }
+    }
+
+    private string _uiPlatformHeader = "NGUỒN LIVESTREAM — Thêm YouTube, TikTok, Twitch...";
+    public string UiPlatformHeader { get => _uiPlatformHeader; set { _uiPlatformHeader = value; OnPropertyChanged(); } }
+
+    private string _uiPlatformLabel = "Nền tảng:";
+    public string UiPlatformLabel { get => _uiPlatformLabel; set { _uiPlatformLabel = value; OnPropertyChanged(); } }
+
+    private string _uiChannelLabel = "Kênh / ID:";
+    public string UiChannelLabel { get => _uiChannelLabel; set { _uiChannelLabel = value; OnPropertyChanged(); } }
+
+    private string _uiUrlLabel = "URL / Link:";
+    public string UiUrlLabel { get => _uiUrlLabel; set { _uiUrlLabel = value; OnPropertyChanged(); } }
+
+    private string _uiAddSource = "＋  Thêm nguồn";
+    public string UiAddSource { get => _uiAddSource; set { _uiAddSource = value; OnPropertyChanged(); } }
+
+    private string _uiStart = "▶  BẮT ĐẦU";
+    public string UiStart { get => _uiStart; set { _uiStart = value; OnPropertyChanged(); } }
+
+    private string _uiStop = "⏹  DỪNG";
+    public string UiStop { get => _uiStop; set { _uiStop = value; OnPropertyChanged(); } }
+
+    private string _uiAiReply = "Trả lời AI";
+    public string UiAiReply { get => _uiAiReply; set { _uiAiReply = value; OnPropertyChanged(); } }
+
+    private string _uiClearLog = "🗑 Xóa log";
+    public string UiClearLog { get => _uiClearLog; set { _uiClearLog = value; OnPropertyChanged(); } }
+
+    private string _uiCommentsCountSuffix = " bình luận";
+    public string UiCommentsCountSuffix { get => _uiCommentsCountSuffix; set { _uiCommentsCountSuffix = value; OnPropertyChanged(); } }
+
+    private string _uiTabChat = "CHAT LOG";
+    public string UiTabChat { get => _uiTabChat; set { _uiTabChat = value; OnPropertyChanged(); } }
+
+    private string _uiTabSettings = "Cài đặt";
+    public string UiTabSettings { get => _uiTabSettings; set { _uiTabSettings = value; OnPropertyChanged(); } }
+
+    private string _uiCardVoiceHeader = "GIỌNG ĐỌC";
+    public string UiCardVoiceHeader { get => _uiCardVoiceHeader; set { _uiCardVoiceHeader = value; OnPropertyChanged(); } }
+
+    private string _uiCardVoiceSub = "  — Edge TTS tốc độ cao";
+    public string UiCardVoiceSub { get => _uiCardVoiceSub; set { _uiCardVoiceSub = value; OnPropertyChanged(); } }
+
+    private string _uiVoiceLabel = "Giọng nói:";
+    public string UiVoiceLabel { get => _uiVoiceLabel; set { _uiVoiceLabel = value; OnPropertyChanged(); } }
+
+    private string _uiSpeedLabel = "Tốc độ đọc:";
+    public string UiSpeedLabel { get => _uiSpeedLabel; set { _uiSpeedLabel = value; OnPropertyChanged(); } }
+
+    private string _uiOtherCustomLabel = "Tùy biến khác:";
+    public string UiOtherCustomLabel { get => _uiOtherCustomLabel; set { _uiOtherCustomLabel = value; OnPropertyChanged(); } }
+
+    private string _uiEdgeFreeNote = "⚡ Edge TTS miễn phí, mượt mà và tự nhiên nhất";
+    public string UiEdgeFreeNote { get => _uiEdgeFreeNote; set { _uiEdgeFreeNote = value; OnPropertyChanged(); } }
+
+    private string _uiCardCloneHeader = "CLONE GIỌNG & SLANG";
+    public string UiCardCloneHeader { get => _uiCardCloneHeader; set { _uiCardCloneHeader = value; OnPropertyChanged(); } }
+
+    private string _uiCloneLabel = "Clone:";
+    public string UiCloneLabel { get => _uiCloneLabel; set { _uiCloneLabel = value; OnPropertyChanged(); } }
+
+    private string _uiBrowseBtn = "File MP3";
+    public string UiBrowseBtn { get => _uiBrowseBtn; set { _uiBrowseBtn = value; OnPropertyChanged(); } }
+
+    private string _uiClearCloneBtn = "✕ Xóa";
+    public string UiClearCloneBtn { get => _uiClearCloneBtn; set { _uiClearCloneBtn = value; OnPropertyChanged(); } }
+
+    private string _uiElevenLabsKeyLabel = "🔑 API Key (ElevenLabs 10k/tháng)";
+    public string UiElevenLabsKeyLabel { get => _uiElevenLabsKeyLabel; set { _uiElevenLabsKeyLabel = value; OnPropertyChanged(); } }
+
+    private string _uiSlangLabel = "Slang:";
+    public string UiSlangLabel { get => _uiSlangLabel; set { _uiSlangLabel = value; OnPropertyChanged(); } }
+
+    private string _uiCardPromptHeader = "PROMPT TRẢ LỜI AI (9Router Mac Mini)";
+    public string UiCardPromptHeader { get => _uiCardPromptHeader; set { _uiCardPromptHeader = value; OnPropertyChanged(); } }
+
+    private string _uiPromptDesc = " — Tùy biến phong cách và công thức đối đáp của AI";
+    public string UiPromptDesc { get => _uiPromptDesc; set { _uiPromptDesc = value; OnPropertyChanged(); } }
+
+    private string _uiResetPromptBtn = "↺ Khôi phục mặc định";
+    public string UiResetPromptBtn { get => _uiResetPromptBtn; set { _uiResetPromptBtn = value; OnPropertyChanged(); } }
+
+    private string _uiPromptHint = "💡 Gợi ý: Hướng dẫn AI cách xưng hô, tính cách, độ dài câu trả lời...";
+    public string UiPromptHint { get => _uiPromptHint; set { _uiPromptHint = value; OnPropertyChanged(); } }
+
     private static readonly HttpClient _aiHttpClient = new() { Timeout = TimeSpan.FromSeconds(10) };
     private bool _isAiReplyEnabled;
     private CancellationTokenSource? _aiReplyCts;
@@ -201,7 +300,13 @@ public class MainViewModel : INotifyPropertyChanged
             _aiReplyCts = new CancellationTokenSource();
         }
 
-        LoadVoices();
+        // Khởi tạo danh sách ngôn ngữ giao diện & giọng đọc
+        foreach (var lang in LocalizationData.SupportedLanguages)
+        {
+            AvailableLanguages.Add(lang);
+        }
+        _selectedLanguage = AvailableLanguages[0]; // Mặc định Tiếng Việt
+        LoadVoicesForLanguage("vi");
 
         AvailablePlatforms = new ObservableCollection<PlatformInfo>
         {
@@ -221,7 +326,14 @@ public class MainViewModel : INotifyPropertyChanged
         ClearLogCommand = new RelayCommand(() => ChatLog.Clear());
         AddSourceCommand = new RelayCommand(AddSource);
         RemoveSourceCommand = new RelayCommand<LiveSource>(RemoveSource);
-        ResetPromptCommand = new RelayCommand(() => AiSystemPrompt = DefaultAiSystemPrompt);
+        ResetPromptCommand = new RelayCommand(() =>
+        {
+            var code = SelectedLanguage?.Code?.ToLower() ?? "vi";
+            if (LocalizationData.DefaultPrompts.TryGetValue(code, out var def))
+                AiSystemPrompt = def;
+            else
+                AiSystemPrompt = DefaultAiSystemPrompt;
+        });
 
         _chatAggregator.OnMessageAggregated += OnChatMessageReceived;
         _chatAggregator.ConnectionStatusChanged += OnConnectionStatusChanged;
@@ -263,17 +375,208 @@ public class MainViewModel : INotifyPropertyChanged
         ConnectedPlatformsText = LiveSources.Count == 0 ? "⚪ Chưa có nguồn" : $"⚪ {LiveSources.Count} nguồn";
     }
 
-    private void LoadVoices()
+    public void LoadVoicesForLanguage(string langCode)
     {
-        foreach (var v in new VoiceInfo[]
+        AvailableVoices.Clear();
+        if (LocalizationData.VoicesByLanguage.TryGetValue(langCode, out var voices))
         {
-            new() { Id = "vi-VN-HoaiMyNeural", Name = "Hoài My (Nữ - Tiếng Việt)", Gender = "Female" },
-            new() { Id = "vi-VN-NamMinhNeural", Name = "Nam Minh (Nam - Tiếng Việt)", Gender = "Male" },
-        }) AvailableVoices.Add(v);
+            foreach (var v in voices) AvailableVoices.Add(v);
+        }
+        else if (LocalizationData.VoicesByLanguage.TryGetValue("vi", out var defaultVoices))
+        {
+            foreach (var v in defaultVoices) AvailableVoices.Add(v);
+        }
 
-        // Mặc định luôn là Giọng Nữ (Hoài My) khi mở app lên
-        SelectedVoiceId = "vi-VN-HoaiMyNeural";
+        if (AvailableVoices.Count > 0)
+        {
+            SelectedVoiceId = AvailableVoices[0].Id;
+        }
         _ttsOptions.Value.Speed = 1.3;
+    }
+
+    public void ApplyLanguage(LanguageInfo lang)
+    {
+        var code = lang.Code.ToLower();
+
+        switch (code)
+        {
+            case "en":
+                UiPlatformHeader = "LIVESTREAM SOURCES — Add YouTube, TikTok, Twitch...";
+                UiPlatformLabel = "Platform:";
+                UiChannelLabel = "Channel / ID:";
+                UiUrlLabel = "URL / Link:";
+                UiAddSource = "＋  Add Source";
+                UiStart = "▶  START";
+                UiStop = "⏹  STOP";
+                UiAiReply = "AI Reply";
+                UiClearLog = "🗑 Clear Log";
+                UiCommentsCountSuffix = " comments";
+                UiTabChat = "CHAT LOG";
+                UiTabSettings = "Settings";
+                UiCardVoiceHeader = "VOICE SETTINGS";
+                UiCardVoiceSub = "  — High-speed Edge TTS";
+                UiVoiceLabel = "Voice:";
+                UiSpeedLabel = "Speed:";
+                UiOtherCustomLabel = "Options:";
+                UiEdgeFreeNote = "⚡ Edge TTS is free, smooth and natural";
+                UiCardCloneHeader = "VOICE CLONE & SLANG";
+                UiCloneLabel = "Clone:";
+                UiBrowseBtn = "MP3 File";
+                UiClearCloneBtn = "✕ Clear";
+                UiElevenLabsKeyLabel = "🔑 API Key (ElevenLabs)";
+                UiSlangLabel = "Slang:";
+                UiCardPromptHeader = "AI REPLY PROMPT (9Router Mac Mini)";
+                UiPromptDesc = " — Customize AI response personality and rules";
+                UiResetPromptBtn = "↺ Reset Default";
+                UiPromptHint = "💡 Tip: Guide AI tone, humor, concise answers...";
+                StatusText = IsRunning ? "🟢 Running..." : "🟢 Ready";
+                break;
+
+            case "zh":
+                UiPlatformHeader = "直播源 — 添加 YouTube, TikTok, Twitch...";
+                UiPlatformLabel = "平台:";
+                UiChannelLabel = "频道 / ID:";
+                UiUrlLabel = "URL / 链接:";
+                UiAddSource = "＋  添加源";
+                UiStart = "▶  开始";
+                UiStop = "⏹  停止";
+                UiAiReply = "AI 回复";
+                UiClearLog = "🗑 清空日志";
+                UiCommentsCountSuffix = " 条评论";
+                UiTabChat = "弹幕日志";
+                UiTabSettings = "设置";
+                UiCardVoiceHeader = "语音设置";
+                UiCardVoiceSub = "  — 高速 Edge TTS";
+                UiVoiceLabel = "声音:";
+                UiSpeedLabel = "语速:";
+                UiOtherCustomLabel = "其他选项:";
+                UiEdgeFreeNote = "⚡ Edge TTS 免费、流畅且自然";
+                UiCardCloneHeader = "声音克隆与网络俚语";
+                UiCloneLabel = "克隆:";
+                UiBrowseBtn = "MP3 文件";
+                UiClearCloneBtn = "✕ 删除";
+                UiElevenLabsKeyLabel = "🔑 API Key (ElevenLabs)";
+                UiSlangLabel = "俚语:";
+                UiCardPromptHeader = "AI 回复提示词 (9Router Mac Mini)";
+                UiPromptDesc = " — 自定义AI对话风格与规则";
+                UiResetPromptBtn = "↺ 恢复默认";
+                UiPromptHint = "💡 提示：引导AI说话语气、幽默感、回答长度...";
+                StatusText = IsRunning ? "🟢 运行中..." : "🟢 就绪";
+                break;
+
+            case "ja":
+                UiPlatformHeader = "配信ソース — YouTube, TikTok, Twitchを追加...";
+                UiPlatformLabel = "配信元:";
+                UiChannelLabel = "チャンネル / ID:";
+                UiUrlLabel = "URL / リンク:";
+                UiAddSource = "＋  ソース追加";
+                UiStart = "▶  開始";
+                UiStop = "⏹  停止";
+                UiAiReply = "AI 返信";
+                UiClearLog = "🗑 ログ消去";
+                UiCommentsCountSuffix = " コメント";
+                UiTabChat = "チャットログ";
+                UiTabSettings = "設定";
+                UiCardVoiceHeader = "音声設定";
+                UiCardVoiceSub = "  — 高速 Edge TTS";
+                UiVoiceLabel = "音声:";
+                UiSpeedLabel = "読み上げ速度:";
+                UiOtherCustomLabel = "その他設定:";
+                UiEdgeFreeNote = "⚡ Edge TTS は無料で滑らか、自然な発音です";
+                UiCardCloneHeader = "ボイスクローン & スラング";
+                UiCloneLabel = "クローン:";
+                UiBrowseBtn = "MP3ファイル";
+                UiClearCloneBtn = "✕ 削除";
+                UiElevenLabsKeyLabel = "🔑 API Key (ElevenLabs)";
+                UiSlangLabel = "スラング:";
+                UiCardPromptHeader = "AI 返信プロンプト (9Router Mac Mini)";
+                UiPromptDesc = " — AI応答スタイルとルールのカスタマイズ";
+                UiResetPromptBtn = "↺ デフォルトに戻す";
+                UiPromptHint = "💡 ヒント：AIの口調、ユーモア、回答の長さなどを指示...";
+                StatusText = IsRunning ? "🟢 実行中..." : "🟢 準備完了";
+                break;
+
+            case "ko":
+                UiPlatformHeader = "라이브 소스 — YouTube, TikTok, Twitch 추가...";
+                UiPlatformLabel = "플랫폼:";
+                UiChannelLabel = "채널 / ID:";
+                UiUrlLabel = "URL / 링크:";
+                UiAddSource = "＋  소스 추가";
+                UiStart = "▶  시작";
+                UiStop = "⏹  중지";
+                UiAiReply = "AI 응답";
+                UiClearLog = "🗑 로그 삭제";
+                UiCommentsCountSuffix = " 개 댓글";
+                UiTabChat = "채팅 로그";
+                UiTabSettings = "설정";
+                UiCardVoiceHeader = "음성 설정";
+                UiCardVoiceSub = "  — 고속 Edge TTS";
+                UiVoiceLabel = "목소리:";
+                UiSpeedLabel = "읽기 속도:";
+                UiOtherCustomLabel = "기타 설정:";
+                UiEdgeFreeNote = "⚡ Edge TTS는 무료이며 가장 매끄럽고 자연스럽습니다";
+                UiCardCloneHeader = "음성 복제 및 슬랭";
+                UiCloneLabel = "복제:";
+                UiBrowseBtn = "MP3 파일";
+                UiClearCloneBtn = "✕ 삭제";
+                UiElevenLabsKeyLabel = "🔑 API Key (ElevenLabs)";
+                UiSlangLabel = "슬랭:";
+                UiCardPromptHeader = "AI 응답 프롬프트 (9Router Mac Mini)";
+                UiPromptDesc = " — AI 응답 스타일 및 규칙 사용자 지정";
+                UiResetPromptBtn = "↺ 기본값 복원";
+                UiPromptHint = "💡 팁: AI의 어투, 유머, 답변 길이 등을 지정...";
+                StatusText = IsRunning ? "🟢 실행 중..." : "🟢 준비 완료";
+                break;
+
+            default:
+                UiPlatformHeader = "NGUỒN LIVESTREAM — Thêm YouTube, TikTok, Twitch...";
+                UiPlatformLabel = "Nền tảng:";
+                UiChannelLabel = "Kênh / ID:";
+                UiUrlLabel = "URL / Link:";
+                UiAddSource = "＋  Thêm nguồn";
+                UiStart = "▶  BẮT ĐẦU";
+                UiStop = "⏹  DỪNG";
+                UiAiReply = "Trả lời AI";
+                UiClearLog = "🗑 Xóa log";
+                UiCommentsCountSuffix = " bình luận";
+                UiTabChat = "CHAT LOG";
+                UiTabSettings = "Cài đặt";
+                UiCardVoiceHeader = "GIỌNG ĐỌC";
+                UiCardVoiceSub = "  — Edge TTS tốc độ cao";
+                UiVoiceLabel = "Giọng nói:";
+                UiSpeedLabel = "Tốc độ đọc:";
+                UiOtherCustomLabel = "Tùy biến khác:";
+                UiEdgeFreeNote = "⚡ Edge TTS miễn phí, mượt mà và tự nhiên nhất";
+                UiCardCloneHeader = "CLONE GIỌNG & SLANG";
+                UiCloneLabel = "Clone:";
+                UiBrowseBtn = "File MP3";
+                UiClearCloneBtn = "✕ Xóa";
+                UiElevenLabsKeyLabel = "🔑 API Key (ElevenLabs 10k/tháng)";
+                UiSlangLabel = "Slang:";
+                UiCardPromptHeader = "PROMPT TRẢ LỜI AI (9Router Mac Mini)";
+                UiPromptDesc = " — Tùy biến phong cách và công thức đối đáp của AI";
+                UiResetPromptBtn = "↺ Khôi phục mặc định";
+                UiPromptHint = "💡 Gợi ý: Hướng dẫn AI cách xưng hô, tính cách, độ dài câu trả lời...";
+                StatusText = IsRunning ? "🟢 Đang chạy..." : "🟢 Sẵn sàng";
+                break;
+        }
+
+        LoadVoicesForLanguage(code);
+
+        if (LocalizationData.DefaultPrompts.TryGetValue(code, out var defaultPrompt))
+        {
+            AiSystemPrompt = defaultPrompt;
+        }
+
+        var langNotice = code switch
+        {
+            "en" => "🌐 Language switched to English. Native voice & AI prompt updated.",
+            "zh" => "🌐 已切换为简体中文。本地语音与AI提示词已更新。",
+            "ja" => "🌐 言語を日本語に切り替えました。ネイティブ音声とAIプロンプトを更新しました。",
+            "ko" => "🌐 한국어로 변경되었습니다. 원어민 음성 및 AI 프롬프트가 업데이트되었습니다.",
+            _ => "🌐 Đã chuyển sang Tiếng Việt. Giọng đọc & Prompt AI đã đồng bộ."
+        };
+        AddLogEntry("HỆ THỐNG", langNotice, "SYSTEM");
     }
 
     private async Task StartAsync()
@@ -301,23 +604,15 @@ public class MainViewModel : INotifyPropertyChanged
         UpdateSourceCount();
     }
 
-    private static readonly Dictionary<char, string> _digitToVietnamese = new()
+    public string FormatUsernameForSpeech(string? rawUsername)
     {
-        ['0'] = "không",
-        ['1'] = "một",
-        ['2'] = "hai",
-        ['3'] = "ba",
-        ['4'] = "bốn",
-        ['5'] = "năm",
-        ['6'] = "sáu",
-        ['7'] = "bảy",
-        ['8'] = "tám",
-        ['9'] = "chín"
-    };
-
-    public static string FormatUsernameForSpeech(string? rawUsername)
-    {
-        if (string.IsNullOrWhiteSpace(rawUsername)) return "Khán giả";
+        var langCode = SelectedLanguage?.Code?.ToLower() ?? "vi";
+        if (string.IsNullOrWhiteSpace(rawUsername))
+        {
+            return LocalizationData.DefaultViewerNames.TryGetValue(langCode, out var defName) 
+                ? defName 
+                : "Khán giả";
+        }
 
         // Bỏ ký tự @ ở đầu nếu có
         var name = rawUsername.Trim().TrimStart('@');
@@ -325,20 +620,23 @@ public class MainViewModel : INotifyPropertyChanged
         // Bỏ ký tự gạch dưới hoặc gạch nối ngăn cách để đọc mượt mà
         name = name.Replace("_", " ").Replace("-", " ");
 
-        // Chuyển riêng lẻ từng chữ số thành chữ tiếng Việt (vd: Giang11241 -> Giang một một hai bốn một)
+        // Lấy bảng chữ số theo ngôn ngữ đang chọn
+        if (!LocalizationData.DigitsByLanguage.TryGetValue(langCode, out var digitMap))
+        {
+            digitMap = LocalizationData.DigitsByLanguage["vi"];
+        }
+
         var sb = new StringBuilder();
         for (int i = 0; i < name.Length; i++)
         {
             var c = name[i];
-            if (_digitToVietnamese.TryGetValue(c, out var digitWord))
+            if (digitMap.TryGetValue(c, out var digitWord))
             {
-                // Thêm khoảng trắng trước nếu ký tự trước không phải là khoảng trắng
                 if (sb.Length > 0 && sb[^1] != ' ')
                     sb.Append(' ');
 
                 sb.Append(digitWord);
 
-                // Thêm khoảng trắng sau nếu ký tự tiếp theo là chữ cái
                 if (i + 1 < name.Length && char.IsLetter(name[i + 1]))
                     sb.Append(' ');
             }
@@ -351,37 +649,41 @@ public class MainViewModel : INotifyPropertyChanged
         return Regex.Replace(sb.ToString(), @"\s+", " ").Trim();
     }
 
-    private string FormatSpeechText(string platform, string username, string content)
+    private string FormatSpeechText(string platform, string speechUsername, string content)
     {
+        var langCode = SelectedLanguage?.Code?.ToLower() ?? "vi";
         var text = content ?? "";
 
-        // Quy đổi ký tự tiền tệ và ký tự đặc biệt phổ biến sang chữ tiếng Việt
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"(\d+)\s*\$", "$1 đô");
-        text = text.Replace("$", " đô ");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"(\d+)\s*€", "$1 ơ-rô");
-        text = text.Replace("€", " ơ-rô ");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"(\d+)\s*£", "$1 bảng");
-        text = text.Replace("£", " bảng ");
-        text = text.Replace("%", " phần trăm ");
+        if (langCode == "vi")
+        {
+            text = Regex.Replace(text, @"(\d+)\s*\$", "$1 đô");
+            text = text.Replace("$", " đô ");
+            text = Regex.Replace(text, @"(\d+)\s*€", "$1 ơ-rô");
+            text = text.Replace("€", " ơ-rô ");
+            text = Regex.Replace(text, @"(\d+)\s*£", "$1 bảng");
+            text = text.Replace("£", " bảng ");
+            text = text.Replace("%", " phần trăm ");
 
-        // Quy đổi các từ viết tắt phổ biến gaming / livestream
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\bacc\b", "ạc", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\bcmt\b", "comment", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\bib\b", "inbox", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, @"\bacc\b", "ạc", RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, @"\bcmt\b", "comment", RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, @"\bib\b", "inbox", RegexOptions.IgnoreCase);
+        }
 
-        var speechUsername = FormatUsernameForSpeech(username);
+        if (!string.IsNullOrWhiteSpace(PrefixTemplate))
+        {
+            var prefix = PrefixTemplate.Replace("{Platform}", platform ?? "")
+                                       .Replace("{Username}", speechUsername);
+            if (!prefix.EndsWith(" ") && !prefix.EndsWith(":"))
+                prefix += " ";
+            return $"{prefix}{text}";
+        }
 
-        if (string.IsNullOrWhiteSpace(PrefixTemplate))
-            return $"{speechUsername} nói là: {text}";
+        if (LocalizationData.SpeechFormats.TryGetValue(langCode, out var format))
+        {
+            return format.Replace("{Username}", speechUsername).Replace("{Content}", text);
+        }
 
-        var prefix = PrefixTemplate.Replace("{Platform}", platform ?? "")
-                                   .Replace("{Username}", speechUsername);
-
-        // Nếu prefix chưa kết thúc bằng khoảng trắng hoặc dấu hai chấm thì thêm khoảng trắng hợp lý
-        if (!prefix.EndsWith(" ") && !prefix.EndsWith(":"))
-            prefix += " ";
-
-        return $"{prefix}{text}";
+        return $"{speechUsername} nói là: {text}";
     }
 
     private async Task SpeakChatMessageAsync(string platform, string username, string content)
@@ -389,12 +691,14 @@ public class MainViewModel : INotifyPropertyChanged
         if (IsMuted) return;
         try
         {
-            // Tự động chuẩn hóa Slang & Teencode bằng 9Router AI trước khi phát âm
             var normalizedContent = await NormalizeSlangAndTeencodeAsync(content);
             var speechUsername = FormatUsernameForSpeech(username);
+            var langCode = SelectedLanguage?.Code?.ToLower() ?? "vi";
 
-            if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
+            if (langCode == "vi" && _ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts && string.IsNullOrWhiteSpace(PrefixTemplate))
+            {
                 await edgeTts.SpeakCommentAsync(speechUsername, normalizedContent);
+            }
             else
             {
                 var textToSpeak = FormatSpeechText(platform, speechUsername, normalizedContent);
@@ -446,9 +750,14 @@ public class MainViewModel : INotifyPropertyChanged
                     new
                     {
                         role = "system",
-                        content = "Bạn là bộ chuẩn hóa ngôn ngữ livestream tiếng Việt. " +
-                                  "Nhiệm vụ: Chuyển các từ viết tắt, teencode, tiếng lóng mạng xã hội và crypto trong câu sang tiếng Việt tự nhiên đầy đủ để giọng đọc AI phát âm chuẩn nhất. " +
-                                  "Quy tắc tối thượng: Chỉ trả về duy nhất câu đã chuẩn hóa, tuyệt đối không trả lời câu hỏi, không thêm bớt nội dung, không chào hỏi, không thêm icon."
+                        content = (SelectedLanguage?.Code?.ToLower() switch
+                        {
+                            "en" => "You are an English livestream chat normalizer. Task: Expand slang, chat acronyms, abbreviations, and crypto terms into natural clean English words for TTS speech synthesis. Strict rule: Return ONLY the normalized text, do not reply or add any greeting.",
+                            "zh" => "你是直播间弹幕文本规范化助手。任务：将留言中的缩写、网络热梗、拼音缩写及加密货币术语转换为通顺自然的中文，以便TTS语音合成流畅发音。绝对规则：仅返回规范化后的纯文本，不要回答问题，不要添加任何寒暄或问候。",
+                            "ja" => "あなたは配信チャットのテキスト正規化アシスタントです。タスク：コメント内の略語、ネットスラング、暗号資産用語をTTS音声合成が自然に読み上げられる日本語に変換します。絶対ルール：正規化されたテキストのみを返してください。質問への回答や挨拶は一切含めないでください。",
+                            "ko" => "당신은 라이브 채팅 텍스트 정규화 어시스턴트입니다. 임무: 댓글 속의 줄임말, 신조어, 인터넷 유행어, 코인 용어를 TTS 음성이 매끄럽게 발음할 수 있는 자연스러운 표준어로 변환합니다. 절대 규칙: 정규화된 텍스트만 단독 반환하고 질문에 답하거나 인사를 추가하지 마세요.",
+                            _ => "Bạn là bộ chuẩn hóa ngôn ngữ livestream tiếng Việt. Nhiệm vụ: Chuyển các từ viết tắt, teencode, tiếng lóng mạng xã hội và crypto trong câu sang tiếng Việt tự nhiên đầy đủ để giọng đọc AI phát âm chuẩn nhất. Quy tắc tối thượng: Chỉ trả về duy nhất câu đã chuẩn hóa, tuyệt đối không trả lời câu hỏi, không thêm bớt nội dung, không chào hỏi, không thêm icon."
+                        })
                     },
                     new { role = "user", content = text }
                 },

@@ -37,4 +37,5 @@
 - [x] Định dạng đọc từng số riêng lẻ trong tên người xem (ví dụ Giang11241 -> "Giang một một hai bốn một").
 - [x] Thêm khung cấu hình Prompt trả lời AI (9Router Mac Mini) trực quan trên giao diện với nút "↺ Khôi phục mặc định".
 - [x] Khóa chặt chu trình tuần tự: Đọc cmt -> Chờ AI trả lời & đọc xong âm thanh -> Nghỉ 5s rồi mới cho phép đọc câu cmt tiếp theo.
+- [x] Tích hợp nút chọn ngôn ngữ (🌐 EN / VI / ZH / JA / KO) đồng bộ toàn diện: Chuyển đổi toàn bộ ngôn ngữ giao diện + Tự động nạp bộ giọng đọc Edge TTS bản xứ tương ứng (Jenny/Guy, Xiaoxiao/Yunxi, Nanami/Keita, SunHi/InJoon, Hoài My/Nam Minh) + Tự động chuyển đổi System Prompt AI 9Router đối đáp theo từng ngôn ngữ.
 - [x] Rebuild và xuất bản file .exe mới nhất vào `Release_App\TLS1 VoiceLive.exe`.
