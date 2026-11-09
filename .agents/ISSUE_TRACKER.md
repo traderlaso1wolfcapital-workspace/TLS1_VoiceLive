@@ -38,4 +38,5 @@
 - [x] Thêm khung cấu hình Prompt trả lời AI (9Router Mac Mini) trực quan trên giao diện với nút "↺ Khôi phục mặc định".
 - [x] Khóa chặt chu trình tuần tự: Đọc cmt -> Chờ AI trả lời & đọc xong âm thanh -> Nghỉ 5s rồi mới cho phép đọc câu cmt tiếp theo.
 - [x] Tích hợp nút chọn ngôn ngữ (🌐 EN / VI / ZH / JA / KO) đồng bộ toàn diện: Chuyển đổi toàn bộ ngôn ngữ giao diện + Tự động nạp bộ giọng đọc Edge TTS bản xứ tương ứng (Jenny/Guy, Xiaoxiao/Yunxi, Nanami/Keita, SunHi/InJoon, Hoài My/Nam Minh) + Tự động chuyển đổi System Prompt AI 9Router đối đáp theo từng ngôn ngữ.
+- [x] Khắc phục triệt để lỗi XamlParseException khi khởi động (`Cannot add instance of type 'String' to a collection of type 'UIElementCollection'`): Dọn dẹp các dòng thuộc tính XAML bị rớt ngoài thẻ `<TextBlock>` trong `MainWindow.xaml`.
 - [x] Rebuild và xuất bản file .exe mới nhất vào `Release_App\TLS1 VoiceLive.exe`.

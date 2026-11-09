@@ -281,7 +281,6 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-                           FontSize="12" Foreground="#94A3B8"/>
             </Grid>
         </Border>
 
@@ -302,7 +301,6 @@
                         <TextBlock Text="📡 " FontSize="13"/>
                         <TextBlock Text="{Binding UiPlatformHeader}" Foreground="#F59E0B"
                                    FontSize="12" FontWeight="Bold"/>
-                                   Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
@@ -581,7 +579,6 @@
                                                            FontSize="12" FontWeight="Bold"/>
                                                 <TextBlock Text="{Binding UiCardVoiceSub}" Foreground="#94A3B8"
                                                            FontSize="11" VerticalAlignment="Center"/>
-                                                           FontSize="12" FontWeight="Bold"/>
                                             </StackPanel>
                                         </Border>
 
