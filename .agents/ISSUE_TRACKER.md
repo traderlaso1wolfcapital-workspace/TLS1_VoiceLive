@@ -30,3 +30,7 @@
 - [x] Chuyển đổi Cài đặt thành dạng Tab View, di chuyển nút Cài đặt xuống thanh tab.
 - [x] Tách biệt 3 cụm Clone - ElevenLabs Key - Slang, hiện trực tiếp ô nhập ElevenLabs Key.
 - [x] Tích hợp AI 9Router tự động chuẩn hóa Teencode & Slang thông minh trước khi phát âm.
+- [x] Tạo file công cụ `zzPush_To_GitHub.py` chuẩn TLS1 riêng cho dự án TLS1.VoiceLive.
+- [x] Khắc phục triệt để lỗi ấn Dừng bị thoát app (bọc try-catch toàn bộ StopAsync, RelayCommand và thêm global DispatcherUnhandledException handler).
+- [x] Thêm delay 5 giây cho mỗi lần đọc comment và trả lời AI qua hàng đợi SemaphoreSlim.
+- [x] Nâng tốc độ giọng đọc Edge TTS lên 1.3x trong cả code và appsettings.json.

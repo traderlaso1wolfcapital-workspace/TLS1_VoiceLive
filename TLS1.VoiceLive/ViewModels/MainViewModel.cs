@@ -39,6 +39,8 @@ public class MainViewModel : INotifyPropertyChanged
     private string _livestreamUrl = "";
     private string _channelName = "";
     private CancellationTokenSource? _demoCts;
+    private CancellationTokenSource? _liveSpeechCts;
+    private readonly SemaphoreSlim _speechLock = new(1, 1);
     private readonly Dictionary<LiveSource, TLS1.Chat.Providers.BrowserScraperProvider> _scrapers = new();
     private TLS1.Chat.Providers.TikTokConsoleBridge? _tikTokBridge;
 
@@ -254,6 +256,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         // Mặc định luôn là Giọng Nữ (Hoài My) khi mở app lên
         SelectedVoiceId = "vi-VN-HoaiMyNeural";
+        _ttsOptions.Value.Speed = 1.3;
     }
 
     private async Task StartAsync()
@@ -266,6 +269,9 @@ public class MainViewModel : INotifyPropertyChanged
 
         IsRunning = true;
         StatusText = "🟡 Đang chạy...";
+        _liveSpeechCts?.Cancel();
+        _liveSpeechCts?.Dispose();
+        _liveSpeechCts = new CancellationTokenSource();
 
         var demoSources = LiveSources.Where(s => s.PlatformId == "demo").ToList();
         var realSources = LiveSources.Where(s => s.PlatformId != "demo").ToList();
@@ -433,15 +439,7 @@ public class MainViewModel : INotifyPropertyChanged
                 while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
             });
 
-            if (!IsMuted)
-            {
-                _ = SpeakChatMessageAsync(msg.Platform, msg.Username, msg.Content);
-            }
-
-            if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(msg.Content))
-            {
-                _ = Task.Run(async () => await ProcessAiReplyAsync(msg.Username, msg.Content));
-            }
+            _ = Task.Run(async () => await EnqueueCommentVoiceAsync(msg.Platform, msg.Username, msg.Content));
         };
         scraper.OnStatus += (status) =>
         {
@@ -459,21 +457,140 @@ public class MainViewModel : INotifyPropertyChanged
         _scrapers[source] = scraper;
     }
 
+    private async Task EnqueueCommentVoiceAsync(string platform, string username, string content, CancellationToken customToken = default)
+    {
+        if (!IsRunning || IsMuted) return;
+
+        var token = customToken != default ? customToken : (_liveSpeechCts?.Token ?? CancellationToken.None);
+        if (token.IsCancellationRequested) return;
+
+        try
+        {
+            await _speechLock.WaitAsync(token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!IsRunning || IsMuted || token.IsCancellationRequested) return;
+
+            // 1. Phát âm thanh đọc bình luận (đã có chuẩn hóa 9Router AI)
+            await SpeakChatMessageAsync(platform, username, content);
+
+            // 2. Nếu có bật Trả lời AI:
+            if (IsAiReplyEnabled && ShouldAiReply(username, content))
+            {
+                // Delay đúng 5 giây trước khi AI trả lời theo yêu cầu của CEO
+                try
+                {
+                    await Task.Delay(5000, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+
+                if (!IsRunning || !IsAiReplyEnabled || IsMuted || token.IsCancellationRequested) return;
+
+                await ProcessAiReplyAsync(username, content);
+            }
+
+            // 3. Delay đúng 5 giây sau mỗi lần đọc xong trước khi nhường lượt cho cmt kế tiếp theo yêu cầu của CEO
+            try
+            {
+                await Task.Delay(5000, token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Lỗi trong chu trình đọc cmt và trả lời AI");
+        }
+        finally
+        {
+            try { _speechLock.Release(); } catch { }
+        }
+    }
+
     private async Task StopAsync()
     {
-        IsRunning = false;
-        _demoCts?.Cancel();
-        _aiReplyCts?.Cancel();
-        Interlocked.Exchange(ref _isProcessingAiReply, 0);
-        (_ttsEngine as TLS1.AI.Engines.EdgeTtsEngine)?.CancelAll();
-        _tikTokBridge?.Stop();
-        _tikTokBridge?.Dispose();
-        _tikTokBridge = null;
-        foreach (var kv in _scrapers) kv.Value.Stop();
-        _scrapers.Clear();
-        try { await _chatAggregator.DisconnectAllAsync(); } catch { }
-        StatusText = "🟢 Đã dừng";
-        ConnectedPlatformsText = "⚪ Đã ngắt kết nối";
+        try
+        {
+            IsRunning = false;
+
+            try { _liveSpeechCts?.Cancel(); } catch { }
+            try { _liveSpeechCts?.Dispose(); } catch { }
+            _liveSpeechCts = null;
+
+            try { _demoCts?.Cancel(); } catch { }
+            try { _demoCts?.Dispose(); } catch { }
+            _demoCts = null;
+
+            try { _aiReplyCts?.Cancel(); } catch { }
+            try { _aiReplyCts?.Dispose(); } catch { }
+            _aiReplyCts = null;
+
+            Interlocked.Exchange(ref _isProcessingAiReply, 0);
+
+            try
+            {
+                (_ttsEngine as TLS1.AI.Engines.EdgeTtsEngine)?.CancelAll();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning(ex, "Lỗi khi hủy âm thanh TTS");
+            }
+
+            try
+            {
+                _tikTokBridge?.Stop();
+                _tikTokBridge?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning(ex, "Lỗi khi dừng TikTok bridge");
+            }
+            _tikTokBridge = null;
+
+            foreach (var kv in _scrapers.ToList())
+            {
+                try
+                {
+                    kv.Value.Stop();
+                }
+                catch (Exception ex)
+                {
+                    Serilog.Log.Warning(ex, "Lỗi khi dừng scraper {Platform}", kv.Key.PlatformName);
+                }
+            }
+            _scrapers.Clear();
+
+            try
+            {
+                await _chatAggregator.DisconnectAllAsync();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Warning(ex, "Lỗi khi ngắt kết nối ChatAggregator");
+            }
+
+            StatusText = "🟢 Đã dừng";
+            ConnectedPlatformsText = "⚪ Đã ngắt kết nối";
+            AddLogEntry("HỆ THỐNG", "⏹ Đã dừng đọc bình luận.", "SYSTEM");
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Lỗi khi thực thi StopAsync");
+        }
     }
 
     private async Task RunDemoModeAsync()
@@ -506,23 +623,22 @@ public class MainViewModel : INotifyPropertyChanged
                     MessageCount++;
                     while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
                 });
+
                 if (!IsMuted)
                 {
-                    await SpeakChatMessageAsync("Demo", username, message);
+                    await EnqueueCommentVoiceAsync("Demo", username, message, token);
                 }
-
-                if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(message))
+                else
                 {
-                    await ProcessAiReplyAsync(username, message);
+                    try { await Task.Delay(5000, token); }
+                    catch (OperationCanceledException) { break; }
                 }
-                try { await Task.Delay(TimeSpan.FromSeconds(rnd.Next(3, 8)), token); }
-                catch (OperationCanceledException) { break; }
             }
         }
         catch (OperationCanceledException) { }
     }
 
-    private async void OnChatMessageReceived(ChatMessage msg)
+    private void OnChatMessageReceived(ChatMessage msg)
     {
         _dispatcher.Invoke(() =>
         {
@@ -531,15 +647,7 @@ public class MainViewModel : INotifyPropertyChanged
             while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
         });
 
-        if (!IsMuted)
-        {
-            await SpeakChatMessageAsync(msg.Platform, msg.Username, msg.Content);
-        }
-
-        if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(msg.Content))
-        {
-            _ = Task.Run(async () => await ProcessAiReplyAsync(msg.Username, msg.Content));
-        }
+        _ = Task.Run(async () => await EnqueueCommentVoiceAsync(msg.Platform, msg.Username, msg.Content));
     }
 
     private void OnConnectionStatusChanged(bool connected)
@@ -568,15 +676,7 @@ public class MainViewModel : INotifyPropertyChanged
                 while (ChatLog.Count > 200) ChatLog.RemoveAt(0);
             });
 
-            if (!IsMuted)
-            {
-                _ = SpeakChatMessageAsync(msg.Platform, msg.Username, msg.Content);
-            }
-
-            if (IsAiReplyEnabled && !string.IsNullOrWhiteSpace(msg.Content))
-            {
-                _ = Task.Run(async () => await ProcessAiReplyAsync(msg.Username, msg.Content));
-            }
+            _ = Task.Run(async () => await EnqueueCommentVoiceAsync(msg.Platform, msg.Username, msg.Content));
         };
         bridge.OnStatus += (status) =>
         {
@@ -610,8 +710,8 @@ public class MainViewModel : INotifyPropertyChanged
         // Bỏ qua chuỗi cười hoặc spam ký tự vô nghĩa lặp lại (vd: hahaha, kkkk, hehehe)
         if (Regex.IsMatch(trimmed, @"^(ha|he|hi|ho|k|a|h){3,}$", RegexOptions.IgnoreCase)) return false;
 
-        // Cooldown tối thiểu 6 giây giữa 2 lần AI trả lời để không lấn át streamer
-        if ((DateTime.Now - _lastAiReplyTime).TotalSeconds < 6) return false;
+        // Cooldown tối thiểu 5 giây giữa 2 lần AI trả lời để không lấn át streamer
+        if ((DateTime.Now - _lastAiReplyTime).TotalSeconds < 5) return false;
 
         return true;
     }
@@ -753,7 +853,11 @@ public class RelayCommand : ICommand
     public RelayCommand(Action execute, Func<bool>? canExecute = null) { _execute = execute; _canExecute = canExecute; }
     public event EventHandler? CanExecuteChanged { add => CommandManager.RequerySuggested += value; remove => CommandManager.RequerySuggested -= value; }
     public bool CanExecute(object? p) => _canExecute?.Invoke() ?? true;
-    public void Execute(object? p) => _execute();
+    public void Execute(object? p)
+    {
+        try { _execute(); }
+        catch (Exception ex) { Serilog.Log.Error(ex, "Lỗi thực thi RelayCommand"); }
+    }
 }
 
 public class RelayCommand<T> : ICommand
@@ -762,5 +866,9 @@ public class RelayCommand<T> : ICommand
     public RelayCommand(Action<T> execute) => _execute = execute;
     public event EventHandler? CanExecuteChanged { add {} remove {} }
     public bool CanExecute(object? p) => true;
-    public void Execute(object? p) { if (p is T t) _execute(t); }
+    public void Execute(object? p)
+    {
+        try { if (p is T t) _execute(t); }
+        catch (Exception ex) { Serilog.Log.Error(ex, "Lỗi thực thi RelayCommand<T>"); }
+    }
 }

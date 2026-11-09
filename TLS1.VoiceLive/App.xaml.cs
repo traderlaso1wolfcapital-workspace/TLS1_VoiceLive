@@ -22,6 +22,25 @@ public partial class App : System.Windows.Application
                 .WriteTo.Console()
                 .CreateLogger();
 
+            // Bắt và bảo vệ toàn bộ exception không xác định, chống app bị crash/thoát đột ngột
+            DispatcherUnhandledException += (sender, args) =>
+            {
+                Log.Error(args.Exception, "Unhandled UI Exception (đã chặn crash)");
+                args.Handled = true; // Ngăn chặn WPF tự ý đóng ứng dụng
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                if (args.ExceptionObject is Exception ex)
+                    Log.Error(ex, "AppDomain Unhandled Exception");
+            };
+
+            TaskScheduler.UnobservedTaskException += (sender, args) =>
+            {
+                Log.Error(args.Exception, "Unobserved Task Exception");
+                args.SetObserved();
+            };
+
             _host = Host.CreateDefaultBuilder()
                 .UseSerilog()
                 .ConfigureServices((context, services) =>
