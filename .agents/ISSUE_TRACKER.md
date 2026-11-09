@@ -34,3 +34,4 @@
 - [x] Khắc phục triệt để lỗi ấn Dừng bị thoát app (bọc try-catch toàn bộ StopAsync, RelayCommand và thêm global DispatcherUnhandledException handler).
 - [x] Thêm delay 5 giây cho mỗi lần đọc comment và trả lời AI qua hàng đợi SemaphoreSlim.
 - [x] Nâng tốc độ giọng đọc Edge TTS lên 1.3x trong cả code và appsettings.json.
+- [x] Định dạng đọc từng số riêng lẻ trong tên người xem (ví dụ Giang11241 -> "Giang một một hai bốn một").

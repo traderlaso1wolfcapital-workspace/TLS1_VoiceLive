@@ -70,7 +70,8 @@ public class MainViewModel : INotifyPropertyChanged
         "1. Trả lời CỰC KỲ NGẮN GỌN (chỉ đúng 1 câu, tối đa 15-20 từ). " +
         "2. Đi thẳng vào câu trả lời, TUYỆT ĐỐI KHÔNG mở đầu bằng 'Tôi là AI', 'AI nói', 'Chào bạn'. " +
         "3. Xưng hô tự nhiên (em/tui, gọi khán giả bằng tên hoặc bác). " +
-        "4. Tuyệt đối không dùng emoji, icon, hay ký tự markdown (*, #, `) để giọng đọc phát âm mượt.";
+        "4. Tuyệt đối không dùng emoji, icon, hay ký tự markdown (*, #, `) để giọng đọc phát âm mượt. " +
+        "5. Khi gọi tên khán giả có chứa số (vd: Giang11241), chỉ gọi tên chữ cái ngắn gọn (vd: bác Giang) hoặc phát âm riêng lẻ từng số, không đọc thành hàng nghìn hay chục nghìn.";
 
     public bool IsAiReplyEnabled
     {
@@ -284,6 +285,56 @@ public class MainViewModel : INotifyPropertyChanged
         UpdateSourceCount();
     }
 
+    private static readonly Dictionary<char, string> _digitToVietnamese = new()
+    {
+        ['0'] = "không",
+        ['1'] = "một",
+        ['2'] = "hai",
+        ['3'] = "ba",
+        ['4'] = "bốn",
+        ['5'] = "năm",
+        ['6'] = "sáu",
+        ['7'] = "bảy",
+        ['8'] = "tám",
+        ['9'] = "chín"
+    };
+
+    public static string FormatUsernameForSpeech(string? rawUsername)
+    {
+        if (string.IsNullOrWhiteSpace(rawUsername)) return "Khán giả";
+
+        // Bỏ ký tự @ ở đầu nếu có
+        var name = rawUsername.Trim().TrimStart('@');
+
+        // Bỏ ký tự gạch dưới hoặc gạch nối ngăn cách để đọc mượt mà
+        name = name.Replace("_", " ").Replace("-", " ");
+
+        // Chuyển riêng lẻ từng chữ số thành chữ tiếng Việt (vd: Giang11241 -> Giang một một hai bốn một)
+        var sb = new StringBuilder();
+        for (int i = 0; i < name.Length; i++)
+        {
+            var c = name[i];
+            if (_digitToVietnamese.TryGetValue(c, out var digitWord))
+            {
+                // Thêm khoảng trắng trước nếu ký tự trước không phải là khoảng trắng
+                if (sb.Length > 0 && sb[^1] != ' ')
+                    sb.Append(' ');
+
+                sb.Append(digitWord);
+
+                // Thêm khoảng trắng sau nếu ký tự tiếp theo là chữ cái
+                if (i + 1 < name.Length && char.IsLetter(name[i + 1]))
+                    sb.Append(' ');
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        return Regex.Replace(sb.ToString(), @"\s+", " ").Trim();
+    }
+
     private string FormatSpeechText(string platform, string username, string content)
     {
         var text = content ?? "";
@@ -302,11 +353,13 @@ public class MainViewModel : INotifyPropertyChanged
         text = System.Text.RegularExpressions.Regex.Replace(text, @"\bcmt\b", "comment", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         text = System.Text.RegularExpressions.Regex.Replace(text, @"\bib\b", "inbox", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
+        var speechUsername = FormatUsernameForSpeech(username);
+
         if (string.IsNullOrWhiteSpace(PrefixTemplate))
-            return $"{username} nói là: {text}";
+            return $"{speechUsername} nói là: {text}";
 
         var prefix = PrefixTemplate.Replace("{Platform}", platform ?? "")
-                                   .Replace("{Username}", username ?? "");
+                                   .Replace("{Username}", speechUsername);
 
         // Nếu prefix chưa kết thúc bằng khoảng trắng hoặc dấu hai chấm thì thêm khoảng trắng hợp lý
         if (!prefix.EndsWith(" ") && !prefix.EndsWith(":"))
@@ -322,12 +375,13 @@ public class MainViewModel : INotifyPropertyChanged
         {
             // Tự động chuẩn hóa Slang & Teencode bằng 9Router AI trước khi phát âm
             var normalizedContent = await NormalizeSlangAndTeencodeAsync(content);
+            var speechUsername = FormatUsernameForSpeech(username);
 
             if (_ttsEngine is TLS1.AI.Engines.EdgeTtsEngine edgeTts)
-                await edgeTts.SpeakCommentAsync(username, normalizedContent);
+                await edgeTts.SpeakCommentAsync(speechUsername, normalizedContent);
             else
             {
-                var textToSpeak = FormatSpeechText(platform, username, normalizedContent);
+                var textToSpeak = FormatSpeechText(platform, speechUsername, normalizedContent);
                 await _ttsEngine.SpeakAsync(textToSpeak);
             }
         }
@@ -729,7 +783,8 @@ public class MainViewModel : INotifyPropertyChanged
 
         try
         {
-            var reply = await RequestAiReplyFrom9RouterAsync(username, userComment, cts.Token);
+            var speechUsername = FormatUsernameForSpeech(username);
+            var reply = await RequestAiReplyFrom9RouterAsync(speechUsername, userComment, cts.Token);
             
             // Kiểm tra trạng thái hủy ngay sau khi nhận phản hồi (người dùng có thể vừa bỏ tích)
             if (!IsAiReplyEnabled || cts.IsCancellationRequested || string.IsNullOrWhiteSpace(reply))
