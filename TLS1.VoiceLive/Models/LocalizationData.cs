@@ -130,3 +130,4 @@ public static class LocalizationData
         ["ko"] = "{Username} 님의 말: {Content}"
     };
 }
+

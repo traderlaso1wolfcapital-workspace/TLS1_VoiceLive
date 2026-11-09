@@ -8,3 +8,4 @@ public class LanguageInfo
     public string DisplayText => $"{Flag}  {Name}";
     public override string ToString() => DisplayText;
 }
+
