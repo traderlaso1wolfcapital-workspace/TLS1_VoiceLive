@@ -22,6 +22,10 @@ tiktok_profile/
 *.log
 crash_log.txt
 
+# Python artifacts
+__pycache__/
+*.py[cod]
+
 # OS / IDE
 .vscode/
 .idea/
